@@ -32,3 +32,12 @@ class VotingRemoveRefereeEvent extends VotingEvent {
 
   VotingRemoveRefereeEvent({@required this.human});
 }
+
+class VotingVoteEvent extends VotingEvent {
+  final Human candidate;
+  final Human referee;
+  final int value;
+
+  VotingVoteEvent(
+      {@required this.candidate, @required this.referee, @required this.value});
+}

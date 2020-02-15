@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
 
@@ -32,6 +35,8 @@ class ImageSourceBase64 extends ImageSource {
   String base64;
 
   ImageSourceBase64({@required this.base64}) : assert(base64 != null);
+
+  Uint8List toByteArray() => base64Decode(base64);
 }
 
 @HiveType(typeId: 2)
