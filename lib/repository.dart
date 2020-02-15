@@ -68,7 +68,13 @@ class Repository {
   }
 
   Future<Voting> getVoting(int key) async {
-    return Hive.box<Voting>(VotingBoxName).get(key);
+    final voting = Hive.box<Voting>(VotingBoxName).get(key);
+
+    if (voting != null) {
+      voting.id = key;
+    }
+
+    return voting;
   }
 
   Future<void> saveVoting(Voting voting) async {

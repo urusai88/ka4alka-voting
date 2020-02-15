@@ -34,9 +34,15 @@ class HomeScreen extends StatelessWidget {
         if (state is VotingProcessScreenState)
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => VotingProcessScreen(
-                voting: state.voting,
-                candidateId: state.candidate.id,
+              builder: (context) =>
+                  BlocProvider(
+                    create: (context) =>
+                    VotingBloc(
+                      applicationBloc: BlocProvider.of<ApplicationBloc>(
+                          context),
+                    )
+                      ..add(VotingLoadEvent(votingId: state.voting.id)),
+                    child: VotingProcessScreen(candidateId: state.candidate.id),
               ),
             ),
           );
