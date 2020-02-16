@@ -19,5 +19,9 @@ class ScreenBloc extends Bloc<ScreenEvent, ScreenState> {
         voting: event.voting,
         candidate: event.candidate,
       );
+    if (event is VotingResultsScreenEvent)
+      yield VotingResultsScreenState(votingId: event.voting.id);
+    if (event is VotingResultsCarouselScreenEvent)
+      yield VotingResultsCarouselScreenState(votingId: event.voting.id);
   }
 }

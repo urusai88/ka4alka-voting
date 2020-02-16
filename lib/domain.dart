@@ -55,6 +55,10 @@ class Voting {
   @HiveField(3)
   List<Vote> votes = [];
 
+  ///
+  bool get isVotingCompleted =>
+      candidateIds.every((candidateId) => isVoteCompleted(candidateId));
+
   /// Все ли судьи назначили оценку участнику
   bool isVoteCompleted(int candidateId) {
     final votesForCandidate = votes.where((v) =>
@@ -83,6 +87,18 @@ class Voting {
     nv.removeRange(nv.length - remove, nv.length);
 
     return nv.reduce((value, element) => value + element) / nv.length;
+  }
+
+  List<VoteResult> getResult() {
+    final results = candidateIds
+        .map((candidateId) =>
+        VoteResult(
+            candidateId: candidateId, value: getComputedVote(candidateId)))
+        .toList();
+
+    results.sort((v1, v2) => v2.value.compareTo(v1.value));
+
+    return results;
   }
 
   Vote getVote(int candidateId, int refereeId) {
@@ -125,4 +141,11 @@ class Vote {
   int value;
 
   Vote({this.candidateId, this.refereeId, this.value});
+}
+
+class VoteResult {
+  final int candidateId;
+  final double value;
+
+  VoteResult({@required this.candidateId, @required this.value});
 }

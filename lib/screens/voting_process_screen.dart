@@ -3,14 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
+import 'package:ka4alka_voting/constants.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/utils.dart';
 import 'package:ka4alka_voting/widgets.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
-
-final voteValueStyle =
-const TextStyle(fontWeight: FontWeight.bold, fontSize: 60);
 
 class VotingProcessScreen extends StatelessWidget {
   final int candidateId;
@@ -184,7 +182,6 @@ class _LowerContainer extends StatelessWidget {
         return Container();
       },
     );
-    return voting.isVoteCompleted(candidate.id) ? null : Container();
   }
 }
 

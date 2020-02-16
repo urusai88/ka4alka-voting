@@ -45,3 +45,16 @@ class VotingProcessScreenEvent extends ScreenEvent {
       : assert(voting != null),
         assert(candidate != null);
 }
+
+class VotingResultsScreenEvent extends ScreenEvent {
+  final Voting voting;
+
+  VotingResultsScreenEvent({@required this.voting}) : assert(voting != null);
+}
+
+class VotingResultsCarouselScreenEvent extends ScreenEvent {
+  final Voting voting;
+
+  VotingResultsCarouselScreenEvent({@required this.voting})
+      : assert(voting != null);
+}

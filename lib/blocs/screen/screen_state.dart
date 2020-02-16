@@ -29,3 +29,17 @@ class VotingProcessScreenState extends ScreenState {
       : assert(voting != null),
         assert(candidate != null);
 }
+
+class VotingResultsScreenState extends ScreenState {
+  final int votingId;
+
+  VotingResultsScreenState({@required this.votingId})
+      : assert(votingId != null);
+}
+
+class VotingResultsCarouselScreenState extends ScreenState {
+  final int votingId;
+
+  VotingResultsCarouselScreenState({@required this.votingId})
+      : assert(votingId != null);
+}

@@ -3,4 +3,6 @@ export 'human_list_screen.dart';
 export 'voting_edit_screen.dart';
 export 'voting_list_screen.dart';
 export 'voting_process_screen.dart';
+export 'voting_results_carousel_screen.dart';
+export 'voting_results_screen.dart';
 export 'voting_screen.dart';
