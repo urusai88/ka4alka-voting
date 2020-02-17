@@ -98,10 +98,11 @@ class VoteAdapter extends TypeAdapter<Vote> {
     var fields = <int, dynamic>{
       for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Vote()
-      ..candidateId = fields[0] as int
-      ..refereeId = fields[1] as int
-      ..value = fields[2] as int;
+    return Vote(
+      candidateId: fields[0] as int,
+      refereeId: fields[1] as int,
+      value: fields[2] as int,
+    );
   }
 
   @override
@@ -114,5 +115,31 @@ class VoteAdapter extends TypeAdapter<Vote> {
       ..write(obj.refereeId)
       ..writeByte(2)
       ..write(obj.value);
+  }
+}
+
+class EventAdapter extends TypeAdapter<Event> {
+  @override
+  final typeId = 4;
+
+  @override
+  Event read(BinaryReader reader) {
+    var numOfFields = reader.readByte();
+    var fields = <int, dynamic>{
+      for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Event(
+      title: fields[0] as String,
+    )..votingIds = (fields[1] as List)?.cast<int>();
+  }
+
+  @override
+  void write(BinaryWriter writer, Event obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.title)
+      ..writeByte(1)
+      ..write(obj.votingIds);
   }
 }

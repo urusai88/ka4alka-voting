@@ -19,7 +19,11 @@ class HumanDeleteEvent extends ApplicationEvent {
   HumanDeleteEvent({@required this.human});
 }
 
-class VotingCreateEvent extends ApplicationEvent {}
+class VotingCreateEvent extends ApplicationEvent {
+  final int eventId;
+
+  VotingCreateEvent({@required this.eventId});
+}
 
 class VotingUpdateEvent extends ApplicationEvent {
   final Voting voting;
@@ -31,4 +35,18 @@ class VotingDeleteEvent extends ApplicationEvent {
   final Voting voting;
 
   VotingDeleteEvent({@required this.voting});
+}
+
+class EventCreateEvent extends ApplicationEvent {}
+
+class EventUpdateEvent extends ApplicationEvent {
+  final Event event;
+
+  EventUpdateEvent({@required this.event});
+}
+
+class EventDeleteEvent extends ApplicationEvent {
+  final Event event;
+
+  EventDeleteEvent({@required this.event});
 }

@@ -1,14 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ka4alka_voting/blocs/application/application.dart';
-import 'package:ka4alka_voting/blocs/voting/voting.dart';
+import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/extensions.dart';
 import 'package:ka4alka_voting/widgets.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:tuple/tuple.dart';
 
 class VotingEditScreen extends StatelessWidget {
+  final int eventId;
+  final int votingId;
+
+  VotingEditScreen({@required this.eventId, @required this.votingId});
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: StreamBuilder<Tuple2<ApplicationState, VotingState>>(
+        stream: Rx.combineLatest2(
+          BlocProvider.of<ApplicationBloc>(context),
+          BlocProvider.of<VotingBloc>(context),
+          (a, b) => Tuple2(a, b),
+        ),
+        builder: (context, snapshot) {
+          if (snapshot.hasData &&
+              snapshot.data.item1 is ApplicationLoaded &&
+              snapshot.data.item2 is VotingLoadedState) {
+            final applicationState = snapshot.data.item1 as ApplicationLoaded;
+            final votingState = snapshot.data.item2 as VotingLoadedState;
+
+            return ListView(
+              children: <Widget>[
+                ListTile(
+                  title: Text('Список участников'),
+                  trailing: InkWell(
+                    onTap: () {},
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Container(
+                          height: constraints.maxHeight,
+                          width: constraints.maxHeight,
+                          child: Icon(Icons.chevron_right),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                ListTile(
+                  title: Text('Список судей'),
+                  trailing: InkWell(
+                    onTap: () {},
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Container(
+                          height: constraints.maxHeight,
+                          width: constraints.maxHeight,
+                          child: Icon(Icons.chevron_right),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return LoadingPageWidget();
+        },
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(),
       body: BlocBuilder<ApplicationBloc, ApplicationState>(

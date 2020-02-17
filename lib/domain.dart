@@ -142,6 +142,19 @@ class Vote {
   Vote({this.candidateId, this.refereeId, this.value});
 }
 
+@HiveType(typeId: 4)
+class Event {
+  int id;
+
+  @HiveField(0)
+  String title;
+
+  @HiveField(1)
+  List<int> votingIds = [];
+
+  Event({this.title});
+}
+
 class VoteResult {
   final int candidateId;
   final double value;

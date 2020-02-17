@@ -22,6 +22,7 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
       yield ApplicationLoaded(
         humans: (await repository.humans()),
         votings: (await repository.votings()),
+        events: (await repository.events()),
       );
     }
 
@@ -47,19 +48,50 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
     }
 
     if (event is VotingCreateEvent && state is ApplicationLoaded) {
-      await repository.saveVoting(Voting());
+      final eventModel = (state as ApplicationLoaded).events[event.eventId];
+      final voting = await repository.saveVoting(Voting());
+
+      eventModel.votingIds.add(voting.id);
+
+      await repository.saveEvent(eventModel);
 
       yield (state as ApplicationLoaded)
           .copyWith(votings: (await repository.votings()));
     }
 
-    if (event is VotingUpdateEvent && state is ApplicationLoaded) {}
+    if (event is VotingUpdateEvent && state is ApplicationLoaded) {
+      await repository.saveVoting(event.voting);
+
+      yield (state as ApplicationLoaded)
+          .copyWith(votings: (await repository.votings()));
+    }
 
     if (event is VotingDeleteEvent && state is ApplicationLoaded) {
       await repository.deleteVoting(event.voting);
 
       yield (state as ApplicationLoaded)
           .copyWith(votings: (await repository.votings()));
+    }
+
+    if (event is EventCreateEvent && state is ApplicationLoaded) {
+      await repository.saveEvent(Event());
+
+      yield (state as ApplicationLoaded)
+          .copyWith(events: (await repository.events()));
+    }
+
+    if (event is EventUpdateEvent && state is ApplicationLoaded) {
+      await repository.saveEvent(event.event);
+
+      yield (state as ApplicationLoaded)
+          .copyWith(events: (await repository.events()));
+    }
+
+    if (event is EventDeleteEvent && state is ApplicationLoaded) {
+      await repository.deleteEvent(event.event);
+
+      yield (state as ApplicationLoaded)
+          .copyWith(events: (await repository.events()));
     }
   }
 }

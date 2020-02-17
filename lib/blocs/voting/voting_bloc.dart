@@ -17,7 +17,8 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
     if (event is VotingLoadEvent) {
       yield VotingLoadingState();
       yield VotingLoadedState(
-          voting: await applicationBloc.repository.getVoting(event.votingId));
+        voting: await applicationBloc.repository.getVoting(event.votingId),
+      );
     }
 
     if (event is VotingAddCandidateEvent && state is VotingLoadedState) {
@@ -35,7 +36,7 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
 
     if (event is VotingAddRefereeEvent && state is VotingLoadedState) {
       final voting = (state as VotingLoadedState).voting;
-      print(event.human.id);
+
       if (!voting.refereeIds.contains(event.human.id)) {
         voting.refereeIds.add(event.human.id);
         voting.refereeIds.sort();

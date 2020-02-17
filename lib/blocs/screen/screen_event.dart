@@ -1,7 +1,24 @@
 import 'package:ka4alka_voting/domain.dart';
 import 'package:meta/meta.dart';
 
+import 'screen_bloc.dart';
+
 abstract class ScreenEvent {}
+
+class EventListScreenEvent extends ScreenEvent {}
+
+class EventViewScreenEvent extends ScreenEvent {
+  final int id;
+
+  EventViewScreenEvent({@required this.id});
+}
+
+/// Список голосований
+class VotingListScreenEvent extends ScreenEvent {
+  final int eventId;
+
+  VotingListScreenEvent({@required this.eventId});
+}
 
 class HomeScreenEvent extends ScreenEvent {}
 
@@ -17,16 +34,21 @@ class StateScreenEvent extends ScreenEvent {
 }
 */
 
-/// Список голосований
-class VotingListScreenEvent extends ScreenEvent {
-  VotingListScreenEvent();
-}
-
 /// Редактирование голосования
 class VotingEditingScreenEvent extends ScreenEvent {
+  final int eventId;
   final int votingId;
 
-  VotingEditingScreenEvent({@required this.votingId});
+  VotingEditingScreenEvent({@required this.votingId, this.eventId});
+}
+
+class VotingHumanListScreenEvent extends ScreenEvent {
+  final int eventId;
+  final int votingId;
+  final HumanList type;
+
+  VotingHumanListScreenEvent(
+      {@required this.eventId, @required this.votingId, @required this.type});
 }
 
 /// Список участников

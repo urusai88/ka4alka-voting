@@ -4,11 +4,9 @@ import 'package:ka4alka_voting/domain.dart';
 class Repository {
   static const HumanBoxName = 'humans';
   static const VotingBoxName = 'voting';
+  static const EventBoxName = 'events';
 
   Future<void> open() async {
-    await Hive.openBox<Human>(HumanBoxName);
-    await Hive.openBox<Voting>(VotingBoxName);
-
     if (Hive.box<Human>(HumanBoxName).isEmpty) {
       saveHuman(Human(title: 'Евгений Васечкин'));
       saveHuman(Human(title: 'Арсений Титов'));
@@ -53,6 +51,14 @@ class Repository {
     });
   }
 
+  Future<Map<int, Event>> events() async {
+    return Hive.box<Event>(EventBoxName).toMap().map((key, value) {
+      value.id = key;
+
+      return MapEntry(key, value);
+    });
+  }
+
   Future<void> saveHuman(Human human) async {
     final box = Hive.box<Human>(HumanBoxName);
 
@@ -77,7 +83,7 @@ class Repository {
     return voting;
   }
 
-  Future<void> saveVoting(Voting voting) async {
+  Future<Voting> saveVoting(Voting voting) async {
     final box = Hive.box<Voting>(VotingBoxName);
 
     if (voting.id == null) {
@@ -85,9 +91,25 @@ class Repository {
     } else {
       await box.put(voting.id, voting);
     }
+
+    return voting;
   }
 
   Future<void> deleteVoting(Voting voting) async {
     Hive.box<Voting>(VotingBoxName).delete(voting.id);
+  }
+
+  Future<void> saveEvent(Event event) async {
+    final box = Hive.box<Event>(EventBoxName);
+
+    if (event.id == null) {
+      event.id = await box.add(event);
+    } else {
+      await box.put(event.id, event);
+    }
+  }
+
+  Future<void> deleteEvent(Event event) async {
+    Hive.box<Event>(EventBoxName).delete(event.id);
   }
 }
