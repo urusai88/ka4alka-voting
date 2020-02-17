@@ -24,13 +24,12 @@ class VotingProcessScreen extends StatelessWidget {
         stream: Rx.combineLatest2(
           BlocProvider.of<ApplicationBloc>(context),
           BlocProvider.of<VotingBloc>(context),
-              (a, b) => Tuple2(a, b),
+          (a, b) => Tuple2(a, b),
         ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final data = snapshot.data;
-            final applicationState = data.item1,
-                votingState = data.item2;
+            final applicationState = data.item1, votingState = data.item2;
 
             if (applicationState is ApplicationLoaded &&
                 votingState is VotingLoadedState) {
@@ -140,9 +139,7 @@ class _MiddleContainer extends StatelessWidget {
               child: _RefereeWidget(
                 referee: humans[refereeId],
                 candidate: candidate,
-                vote: voting
-                    .getVote(candidate.id, refereeId)
-                    .value,
+                vote: voting.getVote(candidate.id, refereeId).value,
               ),
             );
           }).toList(),

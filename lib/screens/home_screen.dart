@@ -7,7 +7,7 @@ import 'package:ka4alka_voting/screens/screens.dart';
 class HomeScreen extends StatelessWidget {
   VotingBloc _createVotingBloc(BuildContext context, {int votingId}) {
     final bloc =
-    VotingBloc(applicationBloc: BlocProvider.of<ApplicationBloc>(context));
+        VotingBloc(applicationBloc: BlocProvider.of<ApplicationBloc>(context));
 
     if (votingId != null) bloc.add(VotingLoadEvent(votingId: votingId));
 
@@ -41,40 +41,34 @@ class HomeScreen extends StatelessWidget {
         if (state is VotingProcessScreenState)
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>
-                  BlocProvider(
-                    create: (context) =>
-                    VotingBloc(
-                      applicationBloc: BlocProvider.of<ApplicationBloc>(
-                          context),
-                    )
-                      ..add(VotingLoadEvent(votingId: state.voting.id)),
-                    child: VotingProcessScreen(candidateId: state.candidate.id),
-                  ),
+              builder: (context) => BlocProvider(
+                create: (context) => VotingBloc(
+                  applicationBloc: BlocProvider.of<ApplicationBloc>(context),
+                )..add(VotingLoadEvent(votingId: state.voting.id)),
+                child: VotingProcessScreen(candidateId: state.candidate.id),
+              ),
             ),
           );
 
         if (state is VotingResultsScreenState)
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>
-                  BlocProvider(
-                    create: (context) =>
-                        _createVotingBloc(context, votingId: state.votingId),
-                    child: VotingResultsScreen(),
-                  ),
+              builder: (context) => BlocProvider(
+                create: (context) =>
+                    _createVotingBloc(context, votingId: state.votingId),
+                child: VotingResultsScreen(),
+              ),
             ),
           );
 
         if (state is VotingResultsCarouselScreenState)
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>
-                  BlocProvider(
-                    create: (context) =>
-                        _createVotingBloc(context, votingId: state.votingId),
-                    child: VotingResultsCarouselScreen(),
-                  ),
+              builder: (context) => BlocProvider(
+                create: (context) =>
+                    _createVotingBloc(context, votingId: state.votingId),
+                child: VotingResultsCarouselScreen(),
+              ),
             ),
           );
       },
