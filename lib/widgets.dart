@@ -25,8 +25,7 @@ class RefereeWidget extends StatefulWidget {
     this.vote,
     this.readOnly = false,
     Key key,
-  })
-      : assert(referee != null),
+  })  : assert(referee != null),
         assert(candidate != null),
         super(key: key);
 

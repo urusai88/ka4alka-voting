@@ -62,7 +62,7 @@ class Voting {
   /// Все ли судьи назначили оценку участнику
   bool isVoteCompleted(int candidateId) {
     final votesForCandidate = votes.where((v) =>
-    v.candidateId == candidateId && refereeIds.contains(v.refereeId));
+        v.candidateId == candidateId && refereeIds.contains(v.refereeId));
 
     return votesForCandidate.length == refereeIds.length &&
         votesForCandidate.every((vote) => vote.value != null);
@@ -70,7 +70,7 @@ class Voting {
 
   double getComputedVote(int candidateId) {
     final votesForCandidate = votes.where((v) =>
-    v.candidateId == candidateId && refereeIds.contains(v.refereeId));
+        v.candidateId == candidateId && refereeIds.contains(v.refereeId));
 
     var remove = 0;
 
@@ -91,8 +91,7 @@ class Voting {
 
   List<VoteResult> getResult() {
     final results = candidateIds
-        .map((candidateId) =>
-        VoteResult(
+        .map((candidateId) => VoteResult(
             candidateId: candidateId, value: getComputedVote(candidateId)))
         .toList();
 
@@ -105,17 +104,17 @@ class Voting {
     if (!candidateIds.contains(candidateId))
       throw StateError(
         'Список Voting.candidateIds не содержит в себе candidateId значения'
-            'Необходимо предоставить candidateId, который есть в списке Voting.candidateIds',
+        'Необходимо предоставить candidateId, который есть в списке Voting.candidateIds',
       );
 
     if (!refereeIds.contains(refereeId))
       throw StateError(
         'Список Voting.refereeIds не содержит в себе refereeId значения'
-            'Необходимо предоставить refereeId, который есть в списке Voting.refereeIds',
+        'Необходимо предоставить refereeId, который есть в списке Voting.refereeIds',
       );
 
     final voteIndex = votes.indexWhere(
-            (v) => v.candidateId == candidateId && v.refereeId == refereeId);
+        (v) => v.candidateId == candidateId && v.refereeId == refereeId);
 
     var vote;
 
