@@ -5,9 +5,11 @@ import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/widgets.dart';
 
 class EventViewScreen extends StatelessWidget {
-  final int id;
+  static const RouteWildcard = r'\/events\/(?<eventId>[\d+])';
 
-  EventViewScreen({@required this.id});
+  final int eventId;
+
+  EventViewScreen({@required this.eventId});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class EventViewScreen extends StatelessWidget {
       body: BlocBuilder<ApplicationBloc, ApplicationState>(
         builder: (context, state) {
           if (state is ApplicationLoaded) {
-            final event = state.events[id];
+            final event = state.events[eventId];
 
             return Column(
               children: <Widget>[

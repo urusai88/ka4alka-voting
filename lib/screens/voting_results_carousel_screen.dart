@@ -12,7 +12,7 @@ import 'package:tuple/tuple.dart';
 
 class VotingResultsCarouselScreen extends StatelessWidget {
   static const RouteWildcard =
-      r'^\/event\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process\/carousel';
+      r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process\/carousel';
 
   @override
   Widget build(BuildContext context) {

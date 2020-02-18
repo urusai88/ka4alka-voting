@@ -47,6 +47,10 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           print(settings.name);
 
+          if (RegExp(r'^\/events\/[\d]+$').hasMatch(settings.name)) {
+            return null;
+          }
+
           VotingBloc _votingBloc(BuildContext context, [int votingId]) {
             final bloc = VotingBloc(
               applicationBloc: BlocProvider.of<ApplicationBloc>(context),
@@ -65,7 +69,7 @@ class MyApp extends StatelessWidget {
             );
           }
 
-          if (settings.name == '/event/list') {
+          if (settings.name == '/events') {
             return MaterialPageRoute(
               builder: (context) => EventListScreen(),
               settings: RouteSettings(name: settings.name),
@@ -127,10 +131,9 @@ class MyApp extends StatelessWidget {
                 settings: RouteSettings(name: settings.name));
           }
 
-          if (settings.name.startsWith(RegExp(
-              r'^\/event\/(?<eventId>[\d+])\/votings\/(?<votingId>[\d+])\/(?<type>[\d+])'))) {
-            final match = RegExp(
-                    r'^\/event\/(?<eventId>[\d+])\/votings\/(?<votingId>[\d+])\/(?<humanType>[\d+])')
+          if (settings.name
+              .startsWith(RegExp(VotingHumanListScreen.RouteWildcard))) {
+            final match = RegExp(VotingHumanListScreen.RouteWildcard)
                 .firstMatch(settings.name);
             final eventId = int.parse(match.namedGroup('eventId'));
             final votingId = int.parse(match.namedGroup('votingId'));
@@ -141,8 +144,7 @@ class MyApp extends StatelessWidget {
                 builder: (context) {
                   return BlocProvider(
                     create: (context) {
-                      return _votingBloc(context)
-                        ..add(VotingLoadEvent(votingId: votingId));
+                      return _votingBloc(context, votingId);
                     },
                     child: VotingHumanListScreen(
                         eventId: eventId, humanType: humanType),
@@ -152,23 +154,23 @@ class MyApp extends StatelessWidget {
           }
 
           if (settings.name
-              .startsWith(RegExp(r'\/event\/(?<eventId>[\d+])\/votings'))) {
-            final match =
-                RegExp(r'^\/event\/(?<id>[\d+])').firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('id'));
+              .startsWith(RegExp(VotingListScreen.RouteWildcard))) {
+            final match = RegExp(VotingListScreen.RouteWildcard)
+                .firstMatch(settings.name);
+            final eventId = int.parse(match.namedGroup('eventId'));
 
             return MaterialPageRoute(
                 builder: (context) => VotingListScreen(eventId: eventId),
                 settings: RouteSettings(name: settings.name));
           }
 
-          if (settings.name.startsWith(RegExp(r'\/event\/(?<id>[\d+])'))) {
+          if (settings.name.startsWith(RegExp(EventViewScreen.RouteWildcard))) {
             final match =
-                RegExp(r'^\/event\/(?<id>[\d+])').firstMatch(settings.name);
-            final id = int.parse(match.namedGroup('id'));
+                RegExp(EventViewScreen.RouteWildcard).firstMatch(settings.name);
+            final eventId = int.parse(match.namedGroup('eventId'));
 
             return MaterialPageRoute(
-                builder: (context) => EventViewScreen(id: id),
+                builder: (context) => EventViewScreen(eventId: eventId),
                 settings: RouteSettings(name: settings.name));
           }
 

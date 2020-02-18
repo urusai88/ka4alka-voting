@@ -10,28 +10,28 @@ class HomeScreen extends StatelessWidget {
       listener: (context, state) {
         final navigator = Navigator.of(context);
 
-        if (state is EventListScreenState) navigator.pushNamed('/event/list');
+        if (state is EventListScreenState) navigator.pushNamed('/events');
         if (state is EventViewScreenState)
-          navigator.pushNamed('/event/${state.id}');
+          navigator.pushNamed('/events/${state.id}');
         if (state is VotingListScreenState)
-          navigator.pushNamed('/event/${state.eventId}/votings');
+          navigator.pushNamed('/events/${state.eventId}/votings');
         if (state is VotingEditScreenState)
           navigator.pushNamed(
-              '/event/${state.eventId}/votings/${state.votingId}/edit');
+              '/events/${state.eventId}/votings/${state.votingId}/edit');
         if (state is VotingHumanListScreenState)
           navigator.pushNamed(
-              '/event/${state.eventId}/votings/${state.votingId}/${state.type.index}');
+              '/events/${state.eventId}/votings/${state.votingId}/${state.type.index}');
         if (state is VotingProcessScreenState)
           navigator.pushNamed(
-            '/event/${state.eventId}/votings/${state.votingId}/process',
+            '/events/${state.eventId}/votings/${state.votingId}/process',
           );
         if (state is VotingProcessCandidateScreenState)
           navigator.pushNamed(
-            '/event/${state.eventId}/votings/${state.votingId}/process/${state.candidateId}',
+            '/events/${state.eventId}/votings/${state.votingId}/process/${state.candidateId}',
           );
         if (state is VotingResultsCarouselScreenState)
           navigator.pushNamed(
-              '/event/${state.eventId}/votings/${state.votingId}/process/carousel');
+              '/events/${state.eventId}/votings/${state.votingId}/process/carousel');
       },
       child: Scaffold(
         appBar: AppBar(),
