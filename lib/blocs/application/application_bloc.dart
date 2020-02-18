@@ -45,12 +45,14 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
           .copyWith(humans: (await repository.humans()));
     }
 
+    /*
     if (event is HumanUpdateEvent && state is ApplicationLoaded) {
       await repository.saveHuman(event.human);
 
       yield (state as ApplicationLoaded)
           .copyWith(humans: (await repository.humans()));
     }
+    */
 
     if (event is HumanDeleteEvent && state is ApplicationLoaded) {
       await repository.deleteHuman(event.human);

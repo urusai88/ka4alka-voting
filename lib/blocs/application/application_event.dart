@@ -15,11 +15,13 @@ class ReloadEvent extends ApplicationEvent {
 
 class HumanCreateEvent extends ApplicationEvent {}
 
+/*
 class HumanUpdateEvent extends ApplicationEvent {
   final Human human;
 
   HumanUpdateEvent({@required this.human});
 }
+*/
 
 class HumanDeleteEvent extends ApplicationEvent {
   final Human human;

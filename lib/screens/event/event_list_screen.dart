@@ -10,7 +10,10 @@ class EventListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Список мероприятий'),
+      ),
       body: BlocBuilder<ApplicationBloc, ApplicationState>(
         builder: (context, state) {
           if (state is ApplicationLoaded) {
@@ -75,12 +78,9 @@ class _EventListBodyState extends State<_EventListBody> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Text(
-        '# ${widget.event.id}',
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       title: TextField(
         controller: _controller,
+        decoration: InputDecoration(hintText: 'Название'),
         onChanged: (value) {
           widget.event.title = value;
 
@@ -97,49 +97,24 @@ class _EventListBodyState extends State<_EventListBody> {
                 EventDeleteEvent(event: widget.event),
               );
             },
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Container(
-                  height: constraints.maxHeight,
-                  width: constraints.maxHeight,
-                  child: Icon(Icons.delete),
-                );
-              },
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Icon(Icons.delete),
             ),
           ),
-          InkWell(
-            onTap: () {
-              BlocProvider.of<ScreenBloc>(context).add(
-                VotingListScreenEvent(eventId: widget.event.id),
-              );
-            },
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Container(
-                  height: constraints.maxHeight,
-                  width: constraints.maxHeight,
-                  child: Icon(Icons.chevron_right),
+          Tooltip(
+            message: 'К номинациям',
+            child: InkWell(
+              onTap: () {
+                BlocProvider.of<ScreenBloc>(context).add(
+                  VotingListScreenEvent(eventId: widget.event.id),
                 );
               },
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Icon(Icons.chevron_right),
+              ),
             ),
-            /*
-          InkWell(
-            onTap: () {
-              BlocProvider.of<ScreenBloc>(context).add(
-                EventViewScreenEvent(id: widget.event.id),
-              );
-            },
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Container(
-                  height: constraints.maxHeight,
-                  width: constraints.maxHeight,
-                  child: Icon(Icons.chevron_right),
-                );
-              },
-            ),
-
-           */
           ),
         ],
       ),

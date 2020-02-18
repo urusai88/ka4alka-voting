@@ -16,7 +16,10 @@ class VotingListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Список номинаций'),
+      ),
       body: BlocBuilder<ApplicationBloc, ApplicationState>(
         builder: (context, state) {
           if (state is ApplicationLoaded) {

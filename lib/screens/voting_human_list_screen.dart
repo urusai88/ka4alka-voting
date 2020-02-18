@@ -24,7 +24,12 @@ class VotingHumanListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(humanType == HumanList.Candidate
+            ? 'Список участников'
+            : 'Список судей'),
+      ),
       body: StreamBuilder<Tuple2<ApplicationState, VotingState>>(
         stream: Rx.combineLatest2(
           BlocProvider.of<ApplicationBloc>(context),
@@ -74,11 +79,19 @@ class _Body extends StatelessWidget {
             itemBuilder: (context, index) {
               if (!list.hasIndex(index)) return null;
 
-              final human = BlocProvider.of<ApplicationBloc>(context)
-                  .repository
-                  .getHuman(list[index]);
+              return BlocProvider(
+                key: ValueKey('human.${list[index]}'),
+                create: (context) => HumanBloc(
+                    applicationBloc: BlocProvider.of<ApplicationBloc>(context))
+                  ..add(HumanLoadEvent(id: list[index])),
+                child: _ListTile(
+                  key: ValueKey('humant.${list[index]}'),
+                  humanId: list[index],
+                  humanType: humanType,
+                ),
+              );
 
-              return _ListTile(human: human, humanType: humanType);
+              return _ListTile(humanId: list[index], humanType: humanType);
             },
           ),
         ),
@@ -88,12 +101,14 @@ class _Body extends StatelessWidget {
 }
 
 class _ListTile extends StatefulWidget {
-  final Human human;
+  // final Human human;
+  final int humanId;
   final HumanList humanType;
 
-  _ListTile({@required this.human, @required this.humanType})
-      : assert(human != null),
-        assert(humanType != null);
+  _ListTile({Key key, @required this.humanId, @required this.humanType})
+      : assert(humanId != null),
+        assert(humanType != null),
+        super(key: key);
 
   @override
   State createState() => _ListTileState();
@@ -106,60 +121,70 @@ class _ListTileState extends State<_ListTile> {
   void initState() {
     super.initState();
 
-    _controller = TextEditingController(text: widget.human.title);
+    _controller = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        child: InkWell(
-          onTap: () async {
-            widget.human.image = ImageSource.fromString(await getFile());
+    return BlocBuilder<HumanBloc, HumanState>(
+      builder: (context, state) {
+        if (state is HumanLoadedState) {
+          if (_controller.text.isEmpty) _controller.text = state.human.title;
 
-            BlocProvider.of<ApplicationBloc>(context)
-                .add(HumanUpdateEvent(human: widget.human));
-          },
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Builder(
-              builder: (context) {
-                if (widget.human.image is ImageSourceBase64) {
-                  try {
-                    return Image.memory(base64.decode(
-                        (widget.human.image as ImageSourceBase64).base64));
-                  } catch (e) {
-                    print(e);
-                  }
-                }
+          return ListTile(
+            leading: Container(
+              child: InkWell(
+                onTap: () async {
+                  state.human.image = ImageSource.fromString(await getFile());
 
-                return Icon(Icons.photo_camera);
+                  BlocProvider.of<HumanBloc>(context)
+                      .add(HumanUpdateEvent(human: state.human));
+                },
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Builder(
+                    builder: (context) {
+                      if (state.human.image is ImageSourceBase64) {
+                        try {
+                          return Image.memory(base64.decode(
+                              (state.human.image as ImageSourceBase64).base64));
+                        } catch (e) {
+                          print(e);
+                        }
+                      }
+
+                      return Icon(Icons.photo_camera);
+                    },
+                  ),
+                ),
+              ),
+            ),
+            title: TextField(
+              controller: _controller,
+              onChanged: (value) {
+                state.human.title = value;
+
+                BlocProvider.of<HumanBloc>(context)
+                    .add(HumanUpdateEvent(human: state.human));
               },
             ),
-          ),
-        ),
-      ),
-      title: TextField(
-        controller: _controller,
-        onChanged: (value) {
-          widget.human.title = value;
-
-          BlocProvider.of<ApplicationBloc>(context)
-              .add(HumanUpdateEvent(human: widget.human));
-        },
-      ),
-      trailing: InkWell(
-        onTap: () {
-          BlocProvider.of<VotingBloc>(context).add(
-            VotingRemoveHuman(
-                humanId: widget.human.id, humanType: widget.humanType),
+            trailing: InkWell(
+              onTap: () {
+                BlocProvider.of<VotingBloc>(context).add(
+                  VotingRemoveHuman(
+                      humanId: state.human.id, humanType: widget.humanType),
+                );
+              },
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Icon(Icons.delete),
+              ),
+            ),
           );
-        },
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: Icon(Icons.delete),
-        ),
-      ),
+        }
+
+        return ListTile();
+      },
     );
   }
 }
