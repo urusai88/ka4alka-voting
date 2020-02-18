@@ -59,6 +59,16 @@ class Repository {
     });
   }
 
+  Human getHuman(int key) {
+    final human = Hive.box<Human>(HumanBoxName).get(key);
+
+    if (human != null) {
+      human.id = key;
+    }
+
+    return human;
+  }
+
   Future<void> saveHuman(Human human) async {
     final box = Hive.box<Human>(HumanBoxName);
 

@@ -5,6 +5,14 @@ abstract class ApplicationEvent {}
 
 class ApplicationLoad extends ApplicationEvent {}
 
+class ReloadEvent extends ApplicationEvent {
+  final bool humans;
+  final bool votings;
+  final bool events;
+
+  ReloadEvent({this.humans = false, this.votings = false, this.events = false});
+}
+
 class HumanCreateEvent extends ApplicationEvent {}
 
 class HumanUpdateEvent extends ApplicationEvent {

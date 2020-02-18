@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/blocs/voting/voting_event.dart';
 import 'package:ka4alka_voting/blocs/voting/voting_state.dart';
+import 'package:ka4alka_voting/domain.dart';
 import 'package:meta/meta.dart';
 
 class VotingBloc extends Bloc<VotingEvent, VotingState> {
@@ -21,31 +22,32 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
       );
     }
 
-    if (event is VotingAddCandidateEvent && state is VotingLoadedState) {
-      final voting = (state as VotingLoadedState).voting;
+    if (event is VotingAddHumanEvent && state is VotingLoadedState) {
+      if (event is VotingAddHumanByNameEvent) {
+        final voting = (state as VotingLoadedState).voting;
+        final human = Human(title: event.name);
 
-      if (!voting.candidateIds.contains(event.human.id)) {
-        voting.candidateIds.add(event.human.id);
-        voting.candidateIds.sort();
+        await applicationBloc.repository.saveHuman(human);
 
-        await applicationBloc.repository.saveVoting(voting);
+        applicationBloc.add(ReloadEvent(humans: true));
 
-        yield VotingLoadedState(voting: voting);
-      }
-    }
-
-    if (event is VotingAddRefereeEvent && state is VotingLoadedState) {
-      final voting = (state as VotingLoadedState).voting;
-
-      if (!voting.refereeIds.contains(event.human.id)) {
-        voting.refereeIds.add(event.human.id);
-        voting.refereeIds.sort();
+        switch (event.type) {
+          case HumanList.Candidate:
+            voting.candidateIds.add(human.id);
+            break;
+          case HumanList.Referee:
+            voting.refereeIds.add(human.id);
+            break;
+        }
 
         await applicationBloc.repository.saveVoting(voting);
 
-        yield VotingLoadedState(voting: voting);
+        yield (state as VotingLoadedState).copyWith(voting: voting);
       }
     }
+
+    if (event is VotingRemoveHuman && state is VotingLoadedState)
+      yield* _mapVotingRemoveHuman(event, state as VotingLoadedState);
 
     if (event is VotingRemoveCandidateEvent && state is VotingLoadedState) {
       final voting = (state as VotingLoadedState).voting;
@@ -82,6 +84,22 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
       await applicationBloc.repository.saveVoting(voting);
 
       yield VotingLoadedState(voting: voting);
+    }
+  }
+
+  Stream<VotingState> _mapVotingRemoveHuman(
+    VotingRemoveHuman event,
+    VotingLoadedState state,
+  ) async* {
+    final voting = state.voting;
+    final list = event.humanType == HumanList.Candidate
+        ? voting.candidateIds
+        : voting.refereeIds;
+
+    if (list.contains(event.humanId)) {
+      list.remove(event.humanId);
+
+      yield state.copyWith(voting: voting);
     }
   }
 }

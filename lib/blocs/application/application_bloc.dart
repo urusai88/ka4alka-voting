@@ -26,6 +26,18 @@ class ApplicationBloc extends Bloc<ApplicationEvent, ApplicationState> {
       );
     }
 
+    if (event is ReloadEvent && state is ApplicationLoaded) {
+      if (event.humans)
+        yield (state as ApplicationLoaded)
+            .copyWith(humans: (await repository.humans()));
+      if (event.events)
+        yield (state as ApplicationLoaded)
+            .copyWith(events: (await repository.events()));
+      if (event.votings)
+        yield (state as ApplicationLoaded)
+            .copyWith(votings: (await repository.votings()));
+    }
+
     if (event is HumanCreateEvent && state is ApplicationLoaded) {
       await repository.saveHuman(Human());
 

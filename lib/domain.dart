@@ -27,7 +27,15 @@ class Human {
 }
 
 // @HiveType(typeId: 4)
-abstract class ImageSource {}
+abstract class ImageSource {
+  // @TODO В данный момент работает только с base64 строкой
+  static ImageSource fromString(String contents) {
+    if (contents.startsWith('data:'))
+      contents = contents.substring(contents.indexOf(',') + 1);
+
+    return ImageSourceBase64(base64: contents);
+  }
+}
 
 @HiveType(typeId: 1)
 class ImageSourceBase64 extends ImageSource {

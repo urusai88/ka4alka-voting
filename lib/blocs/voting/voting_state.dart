@@ -9,4 +9,8 @@ class VotingLoadedState extends VotingState {
   final Voting voting;
 
   VotingLoadedState({@required this.voting});
+
+  VotingLoadedState copyWith({Voting voting}) {
+    return VotingLoadedState(voting: voting);
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:meta/meta.dart';
 
@@ -9,16 +10,35 @@ class VotingLoadEvent extends VotingEvent {
   VotingLoadEvent({@required this.votingId});
 }
 
-class VotingAddCandidateEvent extends VotingEvent {
-  final Human human;
+abstract class VotingAddHumanEvent extends VotingEvent {
+  final HumanList type;
 
-  VotingAddCandidateEvent({@required this.human});
+  VotingAddHumanEvent({@required this.type}) : assert(type != null);
 }
 
-class VotingAddRefereeEvent extends VotingEvent {
-  final Human human;
+class VotingAddHumanByNameEvent extends VotingAddHumanEvent {
+  final String name;
 
-  VotingAddRefereeEvent({@required this.human});
+  VotingAddHumanByNameEvent({@required this.name, @required HumanList type})
+      : assert(name != null && name.trim().length > 0),
+        super(type: type);
+}
+
+class VotingAddHumanByIdEvent extends VotingAddHumanEvent {
+  final int id;
+
+  VotingAddHumanByIdEvent({@required this.id, @required HumanList type})
+      : assert(id != null),
+        super(type: type);
+}
+
+class VotingRemoveHuman extends VotingEvent {
+  final int humanId;
+  final HumanList humanType;
+
+  VotingRemoveHuman({@required this.humanId, @required this.humanType})
+      : assert(humanId != null),
+        assert(humanType != null);
 }
 
 class VotingRemoveCandidateEvent extends VotingEvent {
