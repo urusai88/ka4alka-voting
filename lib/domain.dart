@@ -111,15 +111,15 @@ class Voting {
   Vote getVote(int candidateId, int refereeId) {
     if (!candidateIds.contains(candidateId))
       throw StateError(
-        'Список Voting.candidateIds не содержит в себе candidateId значения'
-        'Необходимо предоставить candidateId, который есть в списке Voting.candidateIds',
-      );
+          'Список Voting.candidateIds не содержит в себе candidateId значения\n'
+          'Необходимо предоставить candidateId, который есть в списке Voting.candidateIds\n'
+          'Voting.candidateIds: $candidateIds\n'
+          'candidateId: $candidateId');
 
     if (!refereeIds.contains(refereeId))
       throw StateError(
-        'Список Voting.refereeIds не содержит в себе refereeId значения'
-        'Необходимо предоставить refereeId, который есть в списке Voting.refereeIds',
-      );
+          'Список Voting.refereeIds не содержит в себе refereeId значения\n'
+          'Необходимо предоставить refereeId, который есть в списке Voting.refereeIds');
 
     final voteIndex = votes.indexWhere(
         (v) => v.candidateId == candidateId && v.refereeId == refereeId);

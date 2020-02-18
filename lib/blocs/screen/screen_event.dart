@@ -51,21 +51,24 @@ class VotingHumanListScreenEvent extends ScreenEvent {
       {@required this.eventId, @required this.votingId, @required this.type});
 }
 
-/// Список участников
-class VotingScreenEvent extends ScreenEvent {
-  final int votingId;
-
-  VotingScreenEvent({@required this.votingId});
-}
-
 /// Процесс голосования
 class VotingProcessScreenEvent extends ScreenEvent {
-  final Voting voting;
-  final Human candidate;
+  final int eventId;
+  final int votingId;
 
-  VotingProcessScreenEvent({@required this.voting, @required this.candidate})
-      : assert(voting != null),
-        assert(candidate != null);
+  VotingProcessScreenEvent({@required this.eventId, @required this.votingId});
+}
+
+/// Процесс голосования отдельного участника
+class VotingProcessCandidateScreenEvent extends ScreenEvent {
+  final int eventId;
+  final int votingId;
+  final int candidateId;
+
+  VotingProcessCandidateScreenEvent(
+      {@required this.eventId,
+      @required this.votingId,
+      @required this.candidateId});
 }
 
 class VotingResultsScreenEvent extends ScreenEvent {
@@ -75,8 +78,11 @@ class VotingResultsScreenEvent extends ScreenEvent {
 }
 
 class VotingResultsCarouselScreenEvent extends ScreenEvent {
-  final Voting voting;
+  final int eventId;
+  final int votingId;
 
-  VotingResultsCarouselScreenEvent({@required this.voting})
-      : assert(voting != null);
+  VotingResultsCarouselScreenEvent(
+      {@required this.eventId, @required this.votingId})
+      : assert(eventId != null),
+        assert(votingId != null);
 }

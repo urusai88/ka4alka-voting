@@ -11,6 +11,9 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
 
 class VotingResultsCarouselScreen extends StatelessWidget {
+  static const RouteWildcard =
+      r'^\/event\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process\/carousel';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,13 +32,18 @@ class VotingResultsCarouselScreen extends StatelessWidget {
               final applicationState = snapshot.data.item1 as ApplicationLoaded;
               final votingState = snapshot.data.item2 as VotingLoadedState;
 
-              return MultiProvider(
-                providers: [
-                  Provider<ApplicationLoaded>(create: (_) => applicationState),
-                  Provider<VotingLoadedState>(create: (_) => votingState),
-                ],
-                child: _Body(voting: votingState.voting),
-              );
+              if (votingState.voting.isVotingCompleted) {
+                return MultiProvider(
+                  providers: [
+                    Provider<ApplicationLoaded>(
+                        create: (_) => applicationState),
+                    Provider<VotingLoadedState>(create: (_) => votingState),
+                  ],
+                  child: _Body(voting: votingState.voting),
+                );
+              } else {
+                return Center(child: Text('Голосование ещё не окончено'));
+              }
             }
           }
 

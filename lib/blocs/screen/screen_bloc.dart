@@ -13,29 +13,26 @@ class ScreenBloc extends Bloc<ScreenEvent, ScreenState> {
     if (event is HumanListScreenEvent) yield HumanListScreenState();
     if (event is VotingEditingScreenEvent)
       yield VotingEditScreenState(
-        votingId: event.votingId,
-        eventId: event.eventId,
-      );
-    if (event is VotingScreenEvent)
-      yield VotingScreenState(votingId: event.votingId);
-    if (event is VotingProcessScreenEvent)
-      yield VotingProcessScreenState(
-        voting: event.voting,
-        candidate: event.candidate,
-      );
+          votingId: event.votingId, eventId: event.eventId);
     if (event is VotingResultsScreenEvent)
       yield VotingResultsScreenState(votingId: event.voting.id);
     if (event is VotingResultsCarouselScreenEvent)
-      yield VotingResultsCarouselScreenState(votingId: event.voting.id);
+      yield VotingResultsCarouselScreenState(
+          eventId: event.eventId, votingId: event.votingId);
     if (event is EventListScreenEvent) yield EventListScreenState();
     if (event is EventViewScreenEvent) yield EventViewScreenState(id: event.id);
     if (event is VotingListScreenEvent)
       yield VotingListScreenState(eventId: event.eventId);
     if (event is VotingHumanListScreenEvent)
       yield VotingHumanListScreenState(
-        eventId: event.eventId,
-        votingId: event.votingId,
-        type: event.type,
-      );
+          eventId: event.eventId, votingId: event.votingId, type: event.type);
+    if (event is VotingProcessScreenEvent)
+      yield VotingProcessScreenState(
+          eventId: event.eventId, votingId: event.votingId);
+    if (event is VotingProcessCandidateScreenEvent)
+      yield VotingProcessCandidateScreenState(
+          eventId: event.eventId,
+          votingId: event.votingId,
+          candidateId: event.candidateId);
   }
 }

@@ -21,6 +21,17 @@ class HomeScreen extends StatelessWidget {
         if (state is VotingHumanListScreenState)
           navigator.pushNamed(
               '/event/${state.eventId}/votings/${state.votingId}/${state.type.index}');
+        if (state is VotingProcessScreenState)
+          navigator.pushNamed(
+            '/event/${state.eventId}/votings/${state.votingId}/process',
+          );
+        if (state is VotingProcessCandidateScreenState)
+          navigator.pushNamed(
+            '/event/${state.eventId}/votings/${state.votingId}/process/${state.candidateId}',
+          );
+        if (state is VotingResultsCarouselScreenState)
+          navigator.pushNamed(
+              '/event/${state.eventId}/votings/${state.votingId}/process/carousel');
       },
       child: Scaffold(
         appBar: AppBar(),

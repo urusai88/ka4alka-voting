@@ -4,6 +4,31 @@ extension ListExtension<T> on List<T> {
   }
 }
 
+extension IterableExtension<T> on Iterable<T> {
+  Iterable<T> insert(T element) sync* {
+    var it = iterator;
+
+    var zero = true;
+
+    while (true) {
+      if (zero) {
+        zero = false;
+
+        if (it.moveNext())
+          yield it.current;
+        else
+          break;
+      }
+
+      if (it.moveNext()) {
+        yield element;
+        yield it.current;
+      } else
+        break;
+    }
+  }
+}
+
 extension MapExtension<TK, TV> on Map<TK, TV> {
   Map<TK, TV> whereKey(TK key) {
     return whereKeyFn((k) => k == key);

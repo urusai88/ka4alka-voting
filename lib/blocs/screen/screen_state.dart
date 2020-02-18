@@ -1,4 +1,3 @@
-import 'package:ka4alka_voting/domain.dart';
 import 'package:meta/meta.dart';
 
 import 'screen_bloc.dart';
@@ -39,21 +38,6 @@ class VotingEditScreenState extends ScreenState {
   VotingEditScreenState({@required this.votingId, this.eventId});
 }
 
-class VotingScreenState extends ScreenState {
-  final int votingId;
-
-  VotingScreenState({@required this.votingId});
-}
-
-class VotingProcessScreenState extends ScreenState {
-  final Voting voting;
-  final Human candidate;
-
-  VotingProcessScreenState({@required this.voting, @required this.candidate})
-      : assert(voting != null),
-        assert(candidate != null);
-}
-
 class VotingResultsScreenState extends ScreenState {
   final int votingId;
 
@@ -62,8 +46,29 @@ class VotingResultsScreenState extends ScreenState {
 }
 
 class VotingResultsCarouselScreenState extends ScreenState {
+  final int eventId;
   final int votingId;
 
-  VotingResultsCarouselScreenState({@required this.votingId})
-      : assert(votingId != null);
+  VotingResultsCarouselScreenState(
+      {@required this.eventId, @required this.votingId})
+      : assert(eventId != null),
+        assert(votingId != null);
+}
+
+class VotingProcessScreenState extends ScreenState {
+  final int eventId;
+  final int votingId;
+
+  VotingProcessScreenState({@required this.eventId, @required this.votingId});
+}
+
+class VotingProcessCandidateScreenState extends ScreenState {
+  final int eventId;
+  final int votingId;
+  final int candidateId;
+
+  VotingProcessCandidateScreenState(
+      {@required this.eventId,
+      @required this.votingId,
+      @required this.candidateId});
 }

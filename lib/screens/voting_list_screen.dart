@@ -166,26 +166,13 @@ class _VotingListBodyState extends State<_VotingListBody> {
             child: InkWell(
               onTap: () {
                 BlocProvider.of<ScreenBloc>(context).add(
-                  VotingScreenEvent(votingId: widget.voting.id),
+                  VotingProcessScreenEvent(
+                      eventId: widget.eventId, votingId: widget.voting.id),
                 );
               },
               child: Container(
                 padding: EdgeInsets.all(10),
                 child: Icon(Icons.chevron_right),
-              ),
-            ),
-          ),
-          Tooltip(
-            message: 'Списком в возрастающем порядке',
-            child: InkWell(
-              onTap: () {
-                BlocProvider.of<ScreenBloc>(context).add(
-                  VotingResultsScreenEvent(voting: widget.voting),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Icon(Icons.show_chart),
               ),
             ),
           ),
