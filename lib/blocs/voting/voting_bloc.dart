@@ -99,6 +99,8 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
     if (list.contains(event.humanId)) {
       list.remove(event.humanId);
 
+      await applicationBloc.repository.saveVoting(voting);
+
       yield state.copyWith(voting: voting);
     }
   }
