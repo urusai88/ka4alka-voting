@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/blocs/voting/voting_event.dart';
@@ -79,7 +81,8 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
       final voting = (state as VotingLoadedState).voting;
       final vote = voting.getVote(event.candidate.id, event.referee.id);
 
-      vote.value = event.value;
+      vote.value =
+          event.value == null ? null : math.min(math.max(1, event.value), 15);
 
       await applicationBloc.repository.saveVoting(voting);
 

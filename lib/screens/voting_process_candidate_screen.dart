@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -243,7 +245,10 @@ class _RefereeWidgetState extends State<_RefereeWidget> {
                 decoration: InputDecoration(border: InputBorder.none),
                 style: voteValueStyle,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  WhitelistingTextInputFormatter.digitsOnly,
+                  MaxMinInputFormatter(),
+                ],
                 onChanged: (value) {
                   value = value.trim();
 
@@ -275,5 +280,19 @@ class _RefereeWidgetState extends State<_RefereeWidget> {
         ],
       ),
     );
+  }
+}
+
+class MaxMinInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    try {
+      int v = int.parse(newValue.text);
+
+      return newValue.copyWith(text: '${math.min(math.max(1, v), 15)}');
+    } on FormatException catch (e) {}
+
+    return newValue;
   }
 }
