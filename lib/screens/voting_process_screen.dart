@@ -38,8 +38,6 @@ class VotingProcessScreen extends StatelessWidget {
                 .values
                 .toList();
 
-            // final results = voting.getResult();
-
             return Column(
               children: <Widget>[
                 Container(
@@ -110,19 +108,6 @@ class VotingProcessScreen extends StatelessWidget {
                         ),
                       ),
                     );
-
-                    /*
-                    if (!results.hasIndex(index)) return null;
-
-                    final result = results[index];
-
-                    return ListTile(
-                      title: Text(
-                          applicationState.humans[result.candidateId].title),
-                      trailing: Text(result.value.toString(),
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    );
-                    */
                   }),
                 )
               ],
