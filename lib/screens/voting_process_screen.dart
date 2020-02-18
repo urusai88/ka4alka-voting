@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +11,7 @@ import 'package:tuple/tuple.dart';
 
 class VotingProcessScreen extends StatelessWidget {
   static const RouteWildcard =
-      r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process';
+      r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process$';
 
   final int eventId;
 
@@ -18,7 +20,10 @@ class VotingProcessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Голосование: список'),
+      ),
       body: StreamBuilder<Tuple2<ApplicationState, VotingState>>(
         stream: Rx.combineLatest2(
           BlocProvider.of<ApplicationBloc>(context),

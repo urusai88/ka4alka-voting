@@ -69,6 +69,8 @@ class Voting {
 
   /// Все ли судьи назначили оценку участнику
   bool isVoteCompleted(int candidateId) {
+    if (refereeIds.isEmpty) return false;
+
     final votesForCandidate = votes.where((v) =>
         v.candidateId == candidateId && refereeIds.contains(v.refereeId));
 
