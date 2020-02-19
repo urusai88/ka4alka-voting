@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/constants.dart';
 import 'package:ka4alka_voting/domain.dart';
+import 'package:ka4alka_voting/utils.dart';
 
 import 'blocs/blocs.dart';
 
@@ -48,39 +49,34 @@ class RefereeWidgetState extends State<RefereeWidget> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Expanded(
-            flex: 2,
+          Flexible(
             child: Container(
+              padding: EdgeInsets.all(2.5),
               decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: Colors.grey)),
               ),
               child: Row(
                 children: <Widget>[
                   if (widget.referee.image is ImageSourceBase64)
-                    FittedBox(
-                      fit: BoxFit.fitHeight,
-                      child: CircleAvatar(
+                    CircleAvatar(
+                        radius: 30,
                         backgroundImage: MemoryImage(
                             (widget.referee.image as ImageSourceBase64)
-                                .toByteArray()),
-                      ),
-                    ),
+                                .toByteArray())),
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,
-                      child: Text(
-                        widget.referee.title,
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text(widget.referee.title,
+                          textAlign: TextAlign.center),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          Expanded(
-            flex: 1,
+          Flexible(
             child: Container(
               child: TextField(
                 controller: _controller,
@@ -89,18 +85,33 @@ class RefereeWidgetState extends State<RefereeWidget> {
                 decoration: InputDecoration(border: InputBorder.none),
                 style: voteValueStyle,
                 keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  WhitelistingTextInputFormatter.digitsOnly,
+                  MaxMinInputFormatter(),
+                ],
                 onChanged: (value) {
-                  int v = int.tryParse(value);
+                  value = value.trim();
 
-                  if (v != null) {
+                  if (value == '') {
                     BlocProvider.of<VotingBloc>(context).add(
                       VotingVoteEvent(
                         candidate: widget.candidate,
                         referee: widget.referee,
-                        value: v,
+                        value: null,
                       ),
                     );
+                  } else {
+                    int v = int.tryParse(value);
+
+                    if (v != null) {
+                      BlocProvider.of<VotingBloc>(context).add(
+                        VotingVoteEvent(
+                          candidate: widget.candidate,
+                          referee: widget.referee,
+                          value: v,
+                        ),
+                      );
+                    }
                   }
                 },
               ),

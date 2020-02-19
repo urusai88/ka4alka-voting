@@ -1,25 +1,19 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-Iterable<Widget> insertDivider(Iterable<Widget> ls) sync* {
-  var it = ls.iterator;
+class MaxMinInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    try {
+      int v = int.parse(newValue.text);
 
-  var zero = true;
+      return newValue.copyWith(text: '${math.min(math.max(1, v), 15)}');
+    } on FormatException catch (e) {}
 
-  while (true) {
-    if (zero) {
-      zero = false;
-
-      if (it.moveNext())
-        yield it.current;
-      else
-        break;
-    }
-
-    if (it.moveNext()) {
-      yield VerticalDivider();
-      yield it.current;
-    } else
-      break;
+    return newValue;
   }
 }

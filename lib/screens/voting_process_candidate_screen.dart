@@ -1,7 +1,4 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
@@ -128,7 +125,7 @@ class _MiddleContainer extends StatelessWidget {
                   .repository
                   .getHuman(refereeId);
 
-              return _RefereeWidget(
+              return RefereeWidget(
                 referee: referee,
                 candidate: candidate,
                 vote: voting.getVote(candidate.id, refereeId).value,
@@ -172,117 +169,3 @@ class _LowerContainer extends StatelessWidget {
   }
 }
 
-class _RefereeWidget extends StatefulWidget {
-  final Human referee;
-  final Human candidate;
-  final int vote;
-
-  _RefereeWidget(
-      {@required this.referee, @required this.candidate, this.vote, Key key})
-      : assert(referee != null),
-        assert(candidate != null),
-        super(key: key);
-
-  @override
-  State createState() => _RefereeWidgetState();
-}
-
-class _RefereeWidgetState extends State<_RefereeWidget> {
-  TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = TextEditingController(
-        text: '${widget.vote == null ? '' : widget.vote}');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Flexible(
-          child: Container(
-            padding: EdgeInsets.all(2.5),
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey)),
-            ),
-            child: Row(
-              children: <Widget>[
-                if (widget.referee.image is ImageSourceBase64)
-                  CircleAvatar(
-                      radius: 30,
-                      backgroundImage: MemoryImage(
-                          (widget.referee.image as ImageSourceBase64)
-                              .toByteArray())),
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child:
-                        Text(widget.referee.title, textAlign: TextAlign.center),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Flexible(
-          child: Container(
-            child: TextField(
-              controller: _controller,
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(border: InputBorder.none),
-              style: voteValueStyle,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                WhitelistingTextInputFormatter.digitsOnly,
-                MaxMinInputFormatter(),
-              ],
-              onChanged: (value) {
-                value = value.trim();
-
-                if (value == '') {
-                  BlocProvider.of<VotingBloc>(context).add(
-                    VotingVoteEvent(
-                      candidate: widget.candidate,
-                      referee: widget.referee,
-                      value: null,
-                    ),
-                  );
-                } else {
-                  int v = int.tryParse(value);
-
-                  if (v != null) {
-                    BlocProvider.of<VotingBloc>(context).add(
-                      VotingVoteEvent(
-                        candidate: widget.candidate,
-                        referee: widget.referee,
-                        value: v,
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class MaxMinInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    try {
-      int v = int.parse(newValue.text);
-
-      return newValue.copyWith(text: '${math.min(math.max(1, v), 15)}');
-    } on FormatException catch (e) {}
-
-    return newValue;
-  }
-}
