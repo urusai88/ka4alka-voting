@@ -137,22 +137,6 @@ class _MiddleContainer extends StatelessWidget {
           )
         ],
       ),
-      /*
-      child: Row(
-        children: voting.refereeIds.map((refereeId) {
-          final referee = BlocProvider.of<ApplicationBloc>(context)
-              .repository
-              .getHuman(refereeId);
-
-          return Expanded(
-            child: _RefereeWidget(
-              referee: referee,
-              candidate: candidate,
-              vote: voting.getVote(candidate.id, refereeId).value,
-            ),
-          );
-        }).toList(),
-      ),*/
     );
   }
 }
