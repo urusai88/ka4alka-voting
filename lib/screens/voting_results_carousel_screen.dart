@@ -233,17 +233,26 @@ class _MiddleSubContainerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: refereeList.map((referee) {
-        return Expanded(
-          child: RefereeWidget(
-            referee: referee,
-            candidate: candidate,
-            vote: voting.getVote(candidate.id, referee.id).value,
-            readOnly: true,
-          ),
-        );
-      }).toList(),
+    return Container(
+      alignment: Alignment.topCenter,
+      child: Table(
+        border: TableBorder.all(color: Colors.grey),
+        children: [
+          TableRow(
+            children: voting.refereeIds.map((refereeId) {
+              final referee = BlocProvider.of<ApplicationBloc>(context)
+                  .repository
+                  .getHuman(refereeId);
+
+              return RefereeWidget(
+                referee: referee,
+                candidate: candidate,
+                vote: voting.getVote(candidate.id, refereeId).value,
+              );
+            }).toList(),
+          )
+        ],
+      ),
     );
   }
 }
