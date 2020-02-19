@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/constants.dart';
 import 'package:ka4alka_voting/domain.dart';
-import 'package:ka4alka_voting/extensions.dart';
 import 'package:ka4alka_voting/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -120,26 +119,40 @@ class _MiddleContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.topCenter,
-      decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-      child: Row(
-        children: voting.refereeIds
-            .map((refereeId) {
+      child: Table(
+        border: TableBorder.all(color: Colors.grey),
+        children: [
+          TableRow(
+            children: voting.refereeIds.map((refereeId) {
               final referee = BlocProvider.of<ApplicationBloc>(context)
                   .repository
                   .getHuman(refereeId);
 
-              return Expanded(
-                child: _RefereeWidget(
-                  referee: referee,
-                  candidate: candidate,
-                  vote: voting.getVote(candidate.id, refereeId).value,
-                ),
+              return _RefereeWidget(
+                referee: referee,
+                candidate: candidate,
+                vote: voting.getVote(candidate.id, refereeId).value,
               );
-            })
-            .cast<Widget>()
-            .insert(VerticalDivider())
-            .toList(),
+            }).toList(),
+          )
+        ],
       ),
+      /*
+      child: Row(
+        children: voting.refereeIds.map((refereeId) {
+          final referee = BlocProvider.of<ApplicationBloc>(context)
+              .repository
+              .getHuman(refereeId);
+
+          return Expanded(
+            child: _RefereeWidget(
+              referee: referee,
+              candidate: candidate,
+              vote: voting.getVote(candidate.id, refereeId).value,
+            ),
+          );
+        }).toList(),
+      ),*/
     );
   }
 }
@@ -203,78 +216,75 @@ class _RefereeWidgetState extends State<_RefereeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey)),
-              ),
-              child: Row(
-                children: <Widget>[
-                  if (widget.referee.image is ImageSourceBase64)
-                    CircleAvatar(
-                        backgroundImage: MemoryImage(
-                            (widget.referee.image as ImageSourceBase64)
-                                .toByteArray())),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        widget.referee.title,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Flexible(
+          child: Container(
+            padding: EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey)),
+            ),
+            child: Row(
+              children: <Widget>[
+                if (widget.referee.image is ImageSourceBase64)
+                  CircleAvatar(
+                      radius: 30,
+                      backgroundImage: MemoryImage(
+                          (widget.referee.image as ImageSourceBase64)
+                              .toByteArray())),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child:
+                        Text(widget.referee.title, textAlign: TextAlign.center),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              child: TextField(
-                controller: _controller,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(border: InputBorder.none),
-                style: voteValueStyle,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  WhitelistingTextInputFormatter.digitsOnly,
-                  MaxMinInputFormatter(),
-                ],
-                onChanged: (value) {
-                  value = value.trim();
+        ),
+        Flexible(
+          child: Container(
+            child: TextField(
+              controller: _controller,
+              textAlign: TextAlign.center,
+              decoration: InputDecoration(border: InputBorder.none),
+              style: voteValueStyle,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+                MaxMinInputFormatter(),
+              ],
+              onChanged: (value) {
+                value = value.trim();
 
-                  if (value == '') {
+                if (value == '') {
+                  BlocProvider.of<VotingBloc>(context).add(
+                    VotingVoteEvent(
+                      candidate: widget.candidate,
+                      referee: widget.referee,
+                      value: null,
+                    ),
+                  );
+                } else {
+                  int v = int.tryParse(value);
+
+                  if (v != null) {
                     BlocProvider.of<VotingBloc>(context).add(
                       VotingVoteEvent(
                         candidate: widget.candidate,
                         referee: widget.referee,
-                        value: null,
+                        value: v,
                       ),
                     );
-                  } else {
-                    int v = int.tryParse(value);
-
-                    if (v != null) {
-                      BlocProvider.of<VotingBloc>(context).add(
-                        VotingVoteEvent(
-                          candidate: widget.candidate,
-                          referee: widget.referee,
-                          value: v,
-                        ),
-                      );
-                    }
                   }
-                },
-              ),
+                }
+              },
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
