@@ -63,17 +63,15 @@ class MyApp extends StatelessWidget {
 
           if (settings.name == '/') {
             return MaterialPageRoute(
-              builder: (context) => HomeScreen(),
-              settings:
-                  RouteSettings(name: settings.name, isInitialRoute: true),
-            );
+                builder: (context) => HomeScreen(),
+                settings:
+                    RouteSettings(name: settings.name, isInitialRoute: true));
           }
 
           if (settings.name == '/events') {
             return MaterialPageRoute(
-              builder: (context) => EventListScreen(),
-              settings: RouteSettings(name: settings.name),
-            );
+                builder: (context) => EventListScreen(),
+                settings: RouteSettings(name: settings.name));
           }
 
           if (settings.name

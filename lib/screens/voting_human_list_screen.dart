@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/extensions.dart';
@@ -24,79 +23,105 @@ class VotingHumanListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(humanType == HumanList.Candidate
-            ? 'Список участников'
-            : 'Список судей'),
-      ),
-      body: StreamBuilder<Tuple2<ApplicationState, VotingState>>(
-        stream: Rx.combineLatest2(
-          BlocProvider.of<ApplicationBloc>(context),
-          BlocProvider.of<VotingBloc>(context),
-          (a, b) => Tuple2(a, b),
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.hasData &&
-              snapshot.data.item1 is ApplicationLoaded &&
-              snapshot.data.item2 is VotingLoadedState) {
-            final applicationState = snapshot.data.item1 as ApplicationLoaded;
-            final votingState = snapshot.data.item2 as VotingLoadedState;
+        appBar: AppBar(
+            centerTitle: true,
+            title: Text(humanType == HumanList.Candidate
+                ? 'Список участников'
+                : 'Список судей')),
+        body: StreamBuilder<Tuple2<ApplicationState, VotingState>>(
+            stream: Rx.combineLatest2(BlocProvider.of<ApplicationBloc>(context),
+                BlocProvider.of<VotingBloc>(context), (a, b) => Tuple2(a, b)),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.data.item1 is ApplicationLoaded &&
+                  snapshot.data.item2 is VotingLoadedState) {
+                final applicationState =
+                    snapshot.data.item1 as ApplicationLoaded;
+                final votingState = snapshot.data.item2 as VotingLoadedState;
 
-            return MultiProvider(
-              providers: [
-                Provider(create: (_) => applicationState),
-                Provider(create: (_) => votingState),
-              ],
-              child: _Body(voting: votingState.voting, humanType: humanType),
-            );
-          }
+                return MultiProvider(
+                    providers: [
+                      Provider(create: (_) => applicationState),
+                      Provider(create: (_) => votingState)
+                    ],
+                    child: _Body(
+                        voting: votingState.voting, humanType: humanType));
+              }
 
-          return LoadingPageWidget();
-        },
-      ),
-    );
+              return LoadingPageWidget();
+            }));
   }
 }
 
-class _Body extends StatelessWidget {
+class _Body extends StatefulWidget {
   final Voting voting;
   final HumanList humanType;
 
   _Body({@required this.voting, @required this.humanType});
 
   @override
+  State createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  Animation<Tween> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(vsync: this);
+    /*
+    _animation = Tween<Offset>(
+      begin:
+    );*/
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final list = humanType == HumanList.Candidate
-        ? voting.candidateIds
-        : voting.refereeIds;
+    final list = widget.humanType == HumanList.Candidate
+        ? widget.voting.candidateIds
+        : widget.voting.refereeIds;
 
-    return Column(
-      children: <Widget>[
-        _UpperContainer(voting: voting, humanType: humanType),
-        Expanded(
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              if (!list.hasIndex(index)) return null;
+    return Stack(children: <Widget>[
+      Column(children: <Widget>[
+        _UpperContainer(voting: widget.voting, humanType: widget.humanType),
+        Expanded(child: ListView.builder(itemBuilder: (context, index) {
+          if (!list.hasIndex(index)) return null;
 
-              return BlocProvider(
-                key: ValueKey('human.${list[index]}'),
-                create: (context) => HumanBloc(
-                    applicationBloc: BlocProvider.of<ApplicationBloc>(context))
-                  ..add(HumanLoadEvent(id: list[index])),
-                child: _ListTile(
+          return BlocProvider(
+              key: ValueKey('human.${list[index]}'),
+              create: (context) => HumanBloc(
+                  applicationBloc: BlocProvider.of<ApplicationBloc>(context))
+                ..add(HumanLoadEvent(id: list[index])),
+              child: _ListTile(
                   key: ValueKey('humant.${list[index]}'),
                   humanId: list[index],
-                  humanType: humanType,
-                ),
-              );
+                  humanType: widget.humanType));
+        })),
+      ]),
+      Align(
+          alignment: Alignment.centerRight,
+          child: SlideTransition(
+              position: AlwaysStoppedAnimation(Offset(0, 0)),
+              child: FractionallySizedBox(
+                  widthFactor: 0.5,
+                  child: BlocProvider(
+                      create: (context) {
+                        return VotingListBloc(
+                            applicationBloc:
+                                BlocProvider.of<ApplicationBloc>(context))
+                          ..add(VotingListLoadEvent());
+                      },
+                      child: _CopyFrom(voting: widget.voting)))))
+      /*
+      AnimatedPositioned(
+          duration: Duration(seconds: 1),
+          child: FractionallySizedBox(widthFactor: 0.5, child: _CopyFrom()))
 
-              return _ListTile(humanId: list[index], humanType: humanType);
-            },
-          ),
-        ),
-      ],
-    );
+       */
+    ]);
   }
 }
 
@@ -223,32 +248,13 @@ class _UpperContainerState extends State<_UpperContainer> {
         child: Row(
           children: [
             Expanded(
-              child: TypeAheadField(
-                textFieldConfiguration: TextFieldConfiguration(
-                  autofocus: true,
-                  focusNode: _focusNode,
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Имя',
-                  ),
-                ),
-                suggestionsCallback: (pattern) async {
-                  return null;
-                },
-                itemBuilder: (context, suggestion) {
-                  return null;
-                },
-                onSuggestionSelected: (suggestion) {},
-              ),
-              /*
-              child: TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  hintText: 'Имя',
-                ),
-              ),
-              */
-            ),
+                child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: TextField(
+                        autofocus: true,
+                        focusNode: _focusNode,
+                        controller: _controller,
+                        decoration: InputDecoration(hintText: 'Имя')))),
             InkWell(
               onTap: () {
                 final input = _controller.text.trim();
@@ -270,6 +276,13 @@ class _UpperContainerState extends State<_UpperContainer> {
                 child: Center(child: Icon(Icons.add)),
               ),
             ),
+            InkWell(
+              onTap: () {},
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Center(child: Icon(Icons.content_copy)),
+              ),
+            )
           ],
         ),
       ),
@@ -281,5 +294,93 @@ class _UpperContainerState extends State<_UpperContainer> {
     super.dispose();
 
     _focusNode.dispose();
+  }
+}
+
+class _CopyFrom extends StatelessWidget {
+  final Voting voting;
+
+  _CopyFrom({@required this.voting});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            border: Border(left: BorderSide(color: Colors.grey))),
+        child: Material(
+            child: Column(children: <Widget>[
+          Container(
+              height: 75,
+              alignment: Alignment.center,
+              child: Text('Скопировать из: ')),
+          Expanded(child: BlocBuilder<VotingListBloc, VotingListState>(
+              builder: (context, state) {
+            if (state is VotingListLoadedState) {
+              final votingList = state.votings.values
+                  .where((element) => element.id != voting.id)
+                  .toList();
+
+              return ListView.separated(
+                  itemCount: votingList.length,
+                  separatorBuilder: (context, index) => Divider(),
+                  itemBuilder: (context, index) {
+                    if (!votingList.hasIndex(index)) return null;
+
+                    return _CopyFromTile(voting: votingList[index]);
+                  });
+            }
+
+            return LoadingPageWidget();
+          }))
+        ])));
+  }
+}
+
+class _CopyFromTile extends StatefulWidget {
+  final Voting voting;
+
+  _CopyFromTile({@required this.voting});
+
+  @override
+  State createState() => _CopyFromTileState();
+}
+
+class _CopyFromTileState extends State<_CopyFromTile> {
+  bool isOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      ListTile(
+          title: Text(widget.voting.title),
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            Tooltip(
+                message: 'Скопировать всех',
+                child: InkWell(
+                    onTap: () {},
+                    child: AspectRatio(
+                        aspectRatio: 1, child: Icon(Icons.content_copy)))),
+            Tooltip(
+                message: 'Развернуть',
+                child: InkWell(
+                    onTap: () => setState(() => isOpen = !isOpen),
+                    child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Icon(isOpen
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down))))
+          ])),
+      if (isOpen)
+        BlocProvider(
+            create: (context) => VotingHumanListBloc()
+              ..add(VotingHumanListLoadEvent(ids: widget.voting.refereeIds)),
+            child: BlocBuilder<VotingHumanListBloc, VotingHumanListState>(
+                builder: (context, state) {
+              if (state is VotingHumanListLoadedState) {}
+
+              return LoadingPageWidget();
+            }))
+    ]);
   }
 }

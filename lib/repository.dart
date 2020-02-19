@@ -124,4 +124,6 @@ class Repository {
   }
 
   Box<Voting> votingBox() => Hive.box<Voting>(VotingBoxName);
+
+  Box<Human> humanBox() => Hive.box<Human>(HumanBoxName);
 }
