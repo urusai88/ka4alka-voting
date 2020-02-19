@@ -135,10 +135,14 @@ class _ListTileState extends State<_ListTile> {
             leading: Container(
               child: InkWell(
                 onTap: () async {
-                  state.human.image = ImageSource.fromString(await getFile());
+                  try {
+                    state.human.image = ImageSource.fromString(await getFile());
 
-                  BlocProvider.of<HumanBloc>(context)
-                      .add(HumanUpdateEvent(human: state.human));
+                    BlocProvider.of<HumanBloc>(context)
+                        .add(HumanUpdateEvent(human: state.human));
+                  } catch (e) {
+                    print(e);
+                  }
                 },
                 child: AspectRatio(
                   aspectRatio: 1,
@@ -229,7 +233,6 @@ class _UpperContainerState extends State<_UpperContainer> {
                   ),
                 ),
                 suggestionsCallback: (pattern) async {
-                  print(pattern);
                   return null;
                 },
                 itemBuilder: (context, suggestion) {

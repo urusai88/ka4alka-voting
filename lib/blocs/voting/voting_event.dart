@@ -10,6 +10,12 @@ class VotingLoadEvent extends VotingEvent {
   VotingLoadEvent({@required this.votingId});
 }
 
+class VotingReloadFromStorage extends VotingEvent {
+  final Voting voting;
+
+  VotingReloadFromStorage(this.voting);
+}
+
 abstract class VotingAddHumanEvent extends VotingEvent {
   final HumanList type;
 

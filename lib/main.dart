@@ -117,7 +117,7 @@ class MyApp extends StatelessWidget {
             final eventId = int.parse(match.namedGroup('eventId'));
             final votingId = int.parse(match.namedGroup('votingId'));
             final candidateId = int.parse(match.namedGroup('candidateId'));
-            print(candidateId);
+
             return MaterialPageRoute(
                 builder: (context) {
                   return BlocProvider(

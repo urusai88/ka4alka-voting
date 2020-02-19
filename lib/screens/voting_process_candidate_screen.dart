@@ -215,14 +215,10 @@ class _RefereeWidgetState extends State<_RefereeWidget> {
               child: Row(
                 children: <Widget>[
                   if (widget.referee.image is ImageSourceBase64)
-                    FittedBox(
-                      fit: BoxFit.fitHeight,
-                      child: CircleAvatar(
+                    CircleAvatar(
                         backgroundImage: MemoryImage(
                             (widget.referee.image as ImageSourceBase64)
-                                .toByteArray()),
-                      ),
-                    ),
+                                .toByteArray())),
                   Expanded(
                     child: Container(
                       alignment: Alignment.center,

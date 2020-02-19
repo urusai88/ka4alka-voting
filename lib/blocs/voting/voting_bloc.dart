@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/blocs/voting/voting_event.dart';
 import 'package:ka4alka_voting/blocs/voting/voting_state.dart';
@@ -9,6 +11,7 @@ import 'package:meta/meta.dart';
 
 class VotingBloc extends Bloc<VotingEvent, VotingState> {
   ApplicationBloc applicationBloc;
+  StreamSubscription<BoxEvent> _subscription;
 
   @override
   VotingState get initialState => VotingLoadingState();
@@ -17,8 +20,23 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
 
   @override
   Stream<VotingState> mapEventToState(VotingEvent event) async* {
+    if (event is VotingReloadFromStorage && state is VotingLoadedState) {
+      yield (state as VotingLoadedState).copyWith(voting: event.voting);
+    }
+
     if (event is VotingLoadEvent) {
       yield VotingLoadingState();
+
+      if (_subscription != null) {
+        _subscription.cancel();
+        _subscription = null;
+      }
+
+      _subscription = applicationBloc.repository
+          .votingBox()
+          .watch(key: event.votingId)
+          .listen((boxEvent) => add(VotingReloadFromStorage(boxEvent.value)));
+
       yield VotingLoadedState(
         voting: await applicationBloc.repository.getVoting(event.votingId),
       );
@@ -106,5 +124,12 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
 
       yield state.copyWith(voting: voting);
     }
+  }
+
+  @override
+  Future<void> close() {
+    _subscription.cancel();
+
+    return super.close();
   }
 }

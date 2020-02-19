@@ -122,4 +122,6 @@ class Repository {
   Future<void> deleteEvent(Event event) async {
     Hive.box<Event>(EventBoxName).delete(event.id);
   }
+
+  Box<Voting> votingBox() => Hive.box<Voting>(VotingBoxName);
 }

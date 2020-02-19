@@ -2,6 +2,24 @@ extension ListExtension<T> on List<T> {
   bool hasIndex(int index) {
     return this.length > index;
   }
+
+  List<T> addIf(T value, bool condition) {
+    if (condition) add(value);
+
+    return this;
+  }
+
+  List<T> addAllIf(List<T> values, bool condition) {
+    if (condition) addAll(values);
+
+    return this;
+  }
+
+  List<T> addAllIfFn(List<T> Function() fn, bool condition) {
+    if (condition) addAll(fn());
+
+    return this;
+  }
 }
 
 extension IterableExtension<T> on Iterable<T> {

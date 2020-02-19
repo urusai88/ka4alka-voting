@@ -106,8 +106,6 @@ class _BodyState extends State<_Body> {
         Expanded(
           child: InkWell(
             onTap: () {
-              print(1);
-              print(result.hasIndex(index + 1));
               if (result.hasIndex(index + 1)) setState(() => index++);
             },
             child: Container(

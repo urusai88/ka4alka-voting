@@ -43,6 +43,8 @@ class VotingProcessScreen extends StatelessWidget {
                 .values
                 .toList();
 
+            final result = voting.getResult();
+
             return Column(
               children: <Widget>[
                 Container(
@@ -80,20 +82,42 @@ class VotingProcessScreen extends StatelessWidget {
                               children: voting.votes
                                   .where((vote) => vote.candidateId == human.id)
                                   .where((vote) => vote.value != null)
-                                  .map((vote) => Text('${vote.value}'))
+                                  .map((vote) => Text(
+                                        '${vote.value}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w100,
+                                            color: Colors.grey),
+                                      ))
                                   .cast<Widget>()
                                   .insert(Row(
                                     children: <Widget>[
-                                      Text(' ',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      Icon(Icons.add),
-                                      Text(' ',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
+                                      Text(' '),
+                                      Icon(
+                                        Icons.add,
+                                        color: Colors.grey,
+                                        size: 14,
+                                      ),
+                                      Text(' '),
                                     ],
                                   ))
-                                  .toList(),
+                                  .toList()
+                                  .addAllIfFn(
+                                      () => [
+                                            Text(' '),
+                                            Icon(Icons.arrow_right),
+                                            Text(
+                                                result
+                                                    .firstWhere((e) =>
+                                                        e.candidateId ==
+                                                        human.id)
+                                                    .value
+                                                    .toString(),
+                                                style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontWeight:
+                                                        FontWeight.bold))
+                                          ],
+                                      voting.isVoteCompleted(human.id)),
                             ),
                           ),
                         ],

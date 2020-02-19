@@ -78,9 +78,12 @@ class Voting {
         votesForCandidate.every((vote) => vote.value != null);
   }
 
-  double getComputedVote(int candidateId) {
+  int getComputedVote(int candidateId) {
     final votesForCandidate = votes.where((v) =>
         v.candidateId == candidateId && refereeIds.contains(v.refereeId));
+
+    if (votesForCandidate.where((e) => e.value == null).isNotEmpty ||
+        votesForCandidate.length != refereeIds.length) return null;
 
     var remove = 0;
 
@@ -96,13 +99,14 @@ class Voting {
     nv.removeRange(0, remove);
     nv.removeRange(nv.length - remove, nv.length);
 
-    return nv.reduce((value, element) => value + element) / nv.length;
+    return (nv.reduce((value, element) => value + element) / nv.length).floor();
   }
 
   List<VoteResult> getResult() {
     final results = candidateIds
         .map((candidateId) => VoteResult(
             candidateId: candidateId, value: getComputedVote(candidateId)))
+        .where((element) => element.value != null)
         .toList();
 
     results.sort((v1, v2) => v2.value.compareTo(v1.value));
@@ -167,7 +171,7 @@ class Event {
 
 class VoteResult {
   final int candidateId;
-  final double value;
+  final int value;
 
   VoteResult({@required this.candidateId, @required this.value});
 }
