@@ -13,6 +13,7 @@ import 'package:tuple/tuple.dart';
 class VotingHumanListScreen extends StatelessWidget {
   static const RouteWildcard =
       r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/(?<humanType>[\d]+)';
+
   final int eventId;
   final HumanList humanType;
 
