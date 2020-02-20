@@ -45,7 +45,7 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
     if (event is VotingAddHumanEvent && state is VotingLoadedState) {
       if (event is VotingAddHumanByNameEvent) {
         final voting = (state as VotingLoadedState).voting;
-        final human = Human(title: event.name);
+        final human = Human(title: event.name.trim());
 
         await applicationBloc.repository.saveHuman(human);
 
