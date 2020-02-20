@@ -103,11 +103,15 @@ class Voting {
 
     var remove = 0;
 
+    remove = 2;
+
+    /*
     if (refereeIds.length == 7) {
       remove = 1;
     } else if (refereeIds.length == 9) {
       remove = 2;
     }
+     */
 
     final nv = List<Vote>.of(votesForCandidate).map((e) => e.value).toList();
 
