@@ -69,6 +69,11 @@ class Repository {
     return human;
   }
 
+  Map<int, Human> getHumans(List<int> keys) {
+    return Map.fromIterable(keys.map((key) => getHuman(key)),
+        key: (model) => model.id, value: (model) => model);
+  }
+
   Future<void> saveHuman(Human human) async {
     final box = Hive.box<Human>(HumanBoxName);
 

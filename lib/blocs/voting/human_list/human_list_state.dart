@@ -6,8 +6,7 @@ abstract class VotingHumanListState {}
 class VotingHumanListLoadingState extends VotingHumanListState {}
 
 class VotingHumanListLoadedState extends VotingHumanListState {
-  final int votingId;
   final Map<int, Human> humans;
 
-  VotingHumanListLoadedState({@required this.votingId, @required this.humans});
+  VotingHumanListLoadedState({@required this.humans});
 }

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
+
+import 'blocs/blocs.dart';
 
 part 'domain.g.dart';
 
@@ -20,6 +24,15 @@ class Human {
 
   Human copyWith({String title}) {
     return Human(title: title ?? this.title);
+  }
+
+  Widget getAvatarWidget([double radius = 20]) {
+    return image is ImageSourceBase64
+        ? CircleAvatar(
+            radius: radius,
+            backgroundImage:
+                MemoryImage((image as ImageSourceBase64).toByteArray()))
+        : Icon(Icons.account_circle, size: radius * 2.3);
   }
 
   @override
@@ -66,6 +79,9 @@ class Voting {
   ///
   bool get isVotingCompleted =>
       candidateIds.every((candidateId) => isVoteCompleted(candidateId));
+
+  List<int> getHumanList(HumanList humanType) =>
+      humanType == HumanList.Referee ? refereeIds : candidateIds;
 
   /// Все ли судьи назначили оценку участнику
   bool isVoteCompleted(int candidateId) {

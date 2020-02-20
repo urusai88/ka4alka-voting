@@ -39,13 +39,11 @@ class VotingHumanListScreen extends StatelessWidget {
                     snapshot.data.item1 as ApplicationLoaded;
                 final votingState = snapshot.data.item2 as VotingLoadedState;
 
-                return MultiProvider(
-                    providers: [
-                      Provider(create: (_) => applicationState),
-                      Provider(create: (_) => votingState)
-                    ],
-                    child: _Body(
-                        voting: votingState.voting, humanType: humanType));
+                return MultiProvider(providers: [
+                  Provider(create: (_) => applicationState),
+                  Provider(create: (_) => votingState),
+                  Provider(create: (_) => humanType)
+                ], child: _Body(voting: votingState.voting));
               }
 
               return LoadingPageWidget();
@@ -55,9 +53,8 @@ class VotingHumanListScreen extends StatelessWidget {
 
 class _Body extends StatefulWidget {
   final Voting voting;
-  final HumanList humanType;
 
-  _Body({@required this.voting, @required this.humanType});
+  _Body({@required this.voting});
 
   @override
   State createState() => _BodyState();
@@ -65,28 +62,31 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-  Animation<Tween> _animation;
+  Animation<Offset> _animation;
 
   @override
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(vsync: this);
-    /*
-    _animation = Tween<Offset>(
-      begin:
-    );*/
+    _animationController = AnimationController(
+        vsync: this, value: 1.0, duration: Duration(milliseconds: 250));
+    _animation =
+        Tween<Offset>(begin: const Offset(0, 0), end: const Offset(1, 0))
+            .animate(_animationController);
   }
 
   @override
   Widget build(BuildContext context) {
-    final list = widget.humanType == HumanList.Candidate
+    final list = Provider.of<HumanList>(context) == HumanList.Candidate
         ? widget.voting.candidateIds
         : widget.voting.refereeIds;
 
     return Stack(children: <Widget>[
       Column(children: <Widget>[
-        _UpperContainer(voting: widget.voting, humanType: widget.humanType),
+        _UpperContainer(
+            onOpenCopy: () => _animationController.reverse(),
+            voting: widget.voting,
+            humanType: Provider.of<HumanList>(context)),
         Expanded(child: ListView.builder(itemBuilder: (context, index) {
           if (!list.hasIndex(index)) return null;
 
@@ -98,13 +98,13 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
               child: _ListTile(
                   key: ValueKey('humant.${list[index]}'),
                   humanId: list[index],
-                  humanType: widget.humanType));
+                  humanType: Provider.of<HumanList>(context)));
         })),
       ]),
       Align(
           alignment: Alignment.centerRight,
           child: SlideTransition(
-              position: AlwaysStoppedAnimation(Offset(0, 0)),
+              position: _animation,
               child: FractionallySizedBox(
                   widthFactor: 0.5,
                   child: BlocProvider(
@@ -114,13 +114,9 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
                                 BlocProvider.of<ApplicationBloc>(context))
                           ..add(VotingListLoadEvent());
                       },
-                      child: _CopyFrom(voting: widget.voting)))))
-      /*
-      AnimatedPositioned(
-          duration: Duration(seconds: 1),
-          child: FractionallySizedBox(widthFactor: 0.5, child: _CopyFrom()))
-
-       */
+                      child: _CopyFrom(
+                          voting: widget.voting,
+                          onClose: () => _animationController.forward())))))
     ]);
   }
 }
@@ -157,59 +153,50 @@ class _ListTileState extends State<_ListTile> {
           if (_controller.text.isEmpty) _controller.text = state.human.title;
 
           return ListTile(
-            leading: Container(
-              child: InkWell(
-                onTap: () async {
-                  try {
-                    state.human.image = ImageSource.fromString(await getFile());
-
-                    BlocProvider.of<HumanBloc>(context)
-                        .add(HumanUpdateEvent(human: state.human));
-                  } catch (e) {
-                    print(e);
-                  }
-                },
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Builder(
-                    builder: (context) {
-                      if (state.human.image is ImageSourceBase64) {
+              leading: Container(
+                  child: InkWell(
+                      onTap: () async {
                         try {
-                          return Image.memory(base64.decode(
-                              (state.human.image as ImageSourceBase64).base64));
+                          state.human.image =
+                              ImageSource.fromString(await getFile());
+
+                          BlocProvider.of<HumanBloc>(context)
+                              .add(HumanUpdateEvent(human: state.human));
                         } catch (e) {
                           print(e);
                         }
-                      }
+                      },
+                      child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Builder(builder: (context) {
+                            if (state.human.image is ImageSourceBase64) {
+                              try {
+                                return Image.memory(base64.decode(
+                                    (state.human.image as ImageSourceBase64)
+                                        .base64));
+                              } catch (e) {
+                                print(e);
+                              }
+                            }
 
-                      return Icon(Icons.photo_camera);
-                    },
-                  ),
-                ),
-              ),
-            ),
-            title: TextField(
-              controller: _controller,
-              onChanged: (value) {
-                state.human.title = value;
+                            return Icon(Icons.photo_camera);
+                          })))),
+              title: TextField(
+                controller: _controller,
+                onChanged: (value) {
+                  state.human.title = value;
 
-                BlocProvider.of<HumanBloc>(context)
-                    .add(HumanUpdateEvent(human: state.human));
-              },
-            ),
-            trailing: InkWell(
-              onTap: () {
-                BlocProvider.of<VotingBloc>(context).add(
-                  VotingRemoveHuman(
-                      humanId: state.human.id, humanType: widget.humanType),
-                );
-              },
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Icon(Icons.delete),
+                  BlocProvider.of<HumanBloc>(context)
+                      .add(HumanUpdateEvent(human: state.human));
+                },
               ),
-            ),
-          );
+              trailing: InkWell(
+                  onTap: () {
+                    BlocProvider.of<VotingBloc>(context).add(VotingRemoveHuman(
+                        humanId: state.human.id, humanType: widget.humanType));
+                  },
+                  child:
+                      AspectRatio(aspectRatio: 1, child: Icon(Icons.delete))));
         }
 
         return ListTile();
@@ -221,8 +208,12 @@ class _ListTileState extends State<_ListTile> {
 class _UpperContainer extends StatefulWidget {
   final Voting voting;
   final HumanList humanType;
+  final VoidCallback onOpenCopy;
 
-  _UpperContainer({@required this.humanType, @required this.voting});
+  _UpperContainer(
+      {@required this.humanType,
+      @required this.voting,
+      @required this.onOpenCopy});
 
   @override
   State createState() => _UpperContainerState();
@@ -276,13 +267,14 @@ class _UpperContainerState extends State<_UpperContainer> {
                 child: Center(child: Icon(Icons.add)),
               ),
             ),
-            InkWell(
-              onTap: () {},
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Center(child: Icon(Icons.content_copy)),
-              ),
-            )
+            Tooltip(
+                message: 'Скопировать из другой номинации',
+                child: InkWell(
+                    onTap: () => widget.onOpenCopy?.call(),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Center(child: Icon(Icons.content_copy)),
+                    )))
           ],
         ),
       ),
@@ -299,8 +291,9 @@ class _UpperContainerState extends State<_UpperContainer> {
 
 class _CopyFrom extends StatelessWidget {
   final Voting voting;
+  final VoidCallback onClose;
 
-  _CopyFrom({@required this.voting});
+  _CopyFrom({@required this.voting, @required this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -313,7 +306,15 @@ class _CopyFrom extends StatelessWidget {
           Container(
               height: 75,
               alignment: Alignment.center,
-              child: Text('Скопировать из: ')),
+              child: Row(children: [
+                InkWell(
+                    onTap: () => onClose?.call(),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Icon(Icons.close),
+                    )),
+                Text('Скопировать из: ')
+              ])),
           Expanded(child: BlocBuilder<VotingListBloc, VotingListState>(
               builder: (context, state) {
             if (state is VotingListLoadedState) {
@@ -351,6 +352,8 @@ class _CopyFromTileState extends State<_CopyFromTile> {
 
   @override
   Widget build(BuildContext context) {
+    final humanType = Provider.of<HumanList>(context, listen: false);
+
     return Column(children: <Widget>[
       ListTile(
           title: Text(widget.voting.title),
@@ -358,7 +361,11 @@ class _CopyFromTileState extends State<_CopyFromTile> {
             Tooltip(
                 message: 'Скопировать всех',
                 child: InkWell(
-                    onTap: () {},
+                    onTap: () => BlocProvider.of<VotingBloc>(context)
+                      ..add(VotingCopyHuman(
+                          votingId: widget.voting.id,
+                          humanType:
+                              Provider.of<HumanList>(context, listen: false))),
                     child: AspectRatio(
                         aspectRatio: 1, child: Icon(Icons.content_copy)))),
             Tooltip(
@@ -373,11 +380,39 @@ class _CopyFromTileState extends State<_CopyFromTile> {
           ])),
       if (isOpen)
         BlocProvider(
-            create: (context) => VotingHumanListBloc()
-              ..add(VotingHumanListLoadEvent(ids: widget.voting.refereeIds)),
+            create: (context) => VotingHumanListBloc(
+                applicationBloc: BlocProvider.of<ApplicationBloc>(context))
+              ..add(VotingHumanListLoadEvent(
+                  keys: widget.voting.getHumanList(humanType))),
             child: BlocBuilder<VotingHumanListBloc, VotingHumanListState>(
                 builder: (context, state) {
-              if (state is VotingHumanListLoadedState) {}
+              if (state is VotingHumanListLoadedState) {
+                final humanList = state.humans.values.toList();
+
+                return Container(
+                    padding: EdgeInsets.only(left: 25),
+                    child: Column(
+                      children: humanList.map((human) {
+                        return ListTile(
+                            leading: human.getAvatarWidget(),
+                            title: Text(human.title),
+                            trailing: Tooltip(
+                                message: 'Скопировать',
+                                child: InkWell(
+                                    onTap: () {
+                                      BlocProvider.of<VotingBloc>(context).add(
+                                          VotingAddHumanByIdEvent(
+                                              id: human.id,
+                                              type: Provider.of<HumanList>(
+                                                  context,
+                                                  listen: false)));
+                                    },
+                                    child: AspectRatio(
+                                        aspectRatio: 1,
+                                        child: Icon(Icons.content_copy)))));
+                      }).toList(),
+                    ));
+              }
 
               return LoadingPageWidget();
             }))

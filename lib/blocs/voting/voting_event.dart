@@ -67,3 +67,10 @@ class VotingVoteEvent extends VotingEvent {
   VotingVoteEvent(
       {@required this.candidate, @required this.referee, @required this.value});
 }
+
+class VotingCopyHuman extends VotingEvent {
+  final int votingId;
+  final HumanList humanType;
+
+  VotingCopyHuman({@required this.votingId, @required this.humanType});
+}

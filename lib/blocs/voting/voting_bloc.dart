@@ -106,6 +106,14 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
 
       yield VotingLoadedState(voting: voting);
     }
+
+    if (event is VotingAddHumanByIdEvent && state is VotingLoadedState) {
+      yield* _mapVotingAddHumanById(event, state as VotingLoadedState);
+    }
+
+    if (event is VotingCopyHuman && state is VotingLoadedState) {
+      yield* _mapCopyHuman(event, state as VotingLoadedState);
+    }
   }
 
   Stream<VotingState> _mapVotingRemoveHuman(
@@ -124,6 +132,54 @@ class VotingBloc extends Bloc<VotingEvent, VotingState> {
 
       yield state.copyWith(voting: voting);
     }
+  }
+
+  Stream<VotingState> _mapVotingAddHumanById(
+      VotingAddHumanByIdEvent event, VotingLoadedState state) async* {
+    switch (event.type) {
+      case HumanList.Candidate:
+        if (!state.voting.candidateIds.contains(event.id))
+          state.voting.candidateIds.add(event.id);
+        break;
+      case HumanList.Referee:
+        if (!state.voting.refereeIds.contains(event.id))
+          state.voting.refereeIds.add(event.id);
+        break;
+    }
+
+    await applicationBloc.repository.saveVoting(state.voting);
+
+    yield state.copyWith(voting: state.voting);
+  }
+
+  Stream<VotingState> _mapCopyHuman(
+      VotingCopyHuman event, VotingLoadedState state) async* {
+    List<int> source;
+    List<int> destination;
+
+    Voting sourceVoting =
+        await applicationBloc.repository.getVoting(event.votingId);
+
+    switch (event.humanType) {
+      case HumanList.Candidate:
+        destination = state.voting.candidateIds;
+        source = sourceVoting.candidateIds;
+        break;
+      case HumanList.Referee:
+        destination = state.voting.refereeIds;
+        source = sourceVoting.refereeIds;
+        break;
+    }
+
+    for (final id in source) {
+      if (!destination.contains(id)) {
+        destination.add(id);
+      }
+    }
+
+    await applicationBloc.repository.saveVoting(state.voting);
+
+    yield state.copyWith(voting: state.voting);
   }
 
   @override
