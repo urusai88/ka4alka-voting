@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,16 +75,15 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final list = Provider.of<HumanList>(context) == HumanList.Candidate
-        ? widget.voting.candidateIds
-        : widget.voting.refereeIds;
+    final humanType = Provider.of<HumanList>(context, listen: false);
+    final list = widget.voting.getHumanList(humanType);
 
     return Stack(children: <Widget>[
       Column(children: <Widget>[
         _UpperContainer(
             onOpenCopy: () => _animationController.reverse(),
             voting: widget.voting,
-            humanType: Provider.of<HumanList>(context)),
+            humanType: humanType),
         Expanded(child: ListView.builder(itemBuilder: (context, index) {
           if (!list.hasIndex(index)) return null;
 
@@ -98,7 +95,7 @@ class _BodyState extends State<_Body> with SingleTickerProviderStateMixin {
               child: _ListTile(
                   key: ValueKey('humant.${list[index]}'),
                   humanId: list[index],
-                  humanType: Provider.of<HumanList>(context)));
+                  humanType: humanType));
         })),
       ]),
       Align(
@@ -168,19 +165,9 @@ class _ListTileState extends State<_ListTile> {
                       },
                       child: AspectRatio(
                           aspectRatio: 1,
-                          child: Builder(builder: (context) {
-                            if (state.human.image is ImageSourceBase64) {
-                              try {
-                                return Image.memory(base64.decode(
-                                    (state.human.image as ImageSourceBase64)
-                                        .base64));
-                              } catch (e) {
-                                print(e);
-                              }
-                            }
-
-                            return Icon(Icons.photo_camera);
-                          })))),
+                          child: Builder(
+                              builder: (context) =>
+                                  state.human.getAvatarWidget())))),
               title: TextField(
                 controller: _controller,
                 onChanged: (value) {
@@ -247,34 +234,27 @@ class _UpperContainerState extends State<_UpperContainer> {
                         controller: _controller,
                         decoration: InputDecoration(hintText: 'Имя')))),
             InkWell(
-              onTap: () {
-                final input = _controller.text.trim();
+                onTap: () {
+                  final input = _controller.text.trim();
 
-                if (input.isEmpty) return;
+                  if (input.isEmpty) return;
 
-                BlocProvider.of<VotingBloc>(context).add(
-                  VotingAddHumanByNameEvent(
-                    name: input,
-                    type: widget.humanType,
-                  ),
-                );
+                  BlocProvider.of<VotingBloc>(context).add(
+                      VotingAddHumanByNameEvent(
+                          name: input, type: widget.humanType));
 
-                _controller.text = '';
-                FocusScope.of(context).requestFocus(_focusNode);
-              },
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Center(child: Icon(Icons.add)),
-              ),
-            ),
+                  _controller.text = '';
+                  FocusScope.of(context).requestFocus(_focusNode);
+                },
+                child: AspectRatio(
+                    aspectRatio: 1, child: Center(child: Icon(Icons.add)))),
             Tooltip(
                 message: 'Скопировать из другой номинации',
                 child: InkWell(
                     onTap: () => widget.onOpenCopy?.call(),
                     child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Center(child: Icon(Icons.content_copy)),
-                    )))
+                        aspectRatio: 1,
+                        child: Center(child: Icon(Icons.content_copy)))))
           ],
         ),
       ),
@@ -284,7 +264,6 @@ class _UpperContainerState extends State<_UpperContainer> {
   @override
   void dispose() {
     super.dispose();
-
     _focusNode.dispose();
   }
 }
