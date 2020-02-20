@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:hive/hive.dart';
 import 'package:image/image.dart' as image;
 
 final mimes = const {
@@ -20,10 +19,6 @@ void main() async {
   if (!storageDirectory.existsSync()) {
     storageDirectory.createSync(recursive: true);
   }
-
-  Hive.init('${root.path}/hive');
-
-  final box = await Hive.openBox('images');
 
   try {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4044);
