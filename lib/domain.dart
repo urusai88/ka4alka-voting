@@ -27,12 +27,27 @@ class Human {
   }
 
   Widget getAvatarWidget([double radius = 20]) {
-    return image is ImageSourceBase64
-        ? CircleAvatar(
-            radius: radius,
-            backgroundImage:
-                MemoryImage((image as ImageSourceBase64).toByteArray()))
-        : Icon(Icons.account_circle, size: radius * 2.3);
+    Widget widget;
+
+    if (image == null) {
+      widget = Icon(Icons.account_circle, size: radius * 2.3);
+    }
+
+    if (image is ImageSourceBase64) {
+      widget = CircleAvatar(
+          radius: radius,
+          backgroundImage:
+              MemoryImage((image as ImageSourceBase64).toByteArray()));
+    }
+
+    if (image is ImageSourceFilename) {
+      widget = CircleAvatar(
+          radius: radius,
+          backgroundImage: NetworkImage(
+              '/storage/${(image as ImageSourceFilename).filename}'));
+    }
+
+    return widget;
   }
 
   @override
@@ -41,10 +56,15 @@ class Human {
 
 // @HiveType(typeId: 4)
 abstract class ImageSource {
-  // @TODO В данный момент работает только с base64 строкой
   static ImageSource fromString(String contents) {
-    if (contents.startsWith('data:'))
+    /// Имя файла
+    if (contents.contains('.')) {
+      return ImageSourceFilename(filename: contents);
+    }
+
+    if (contents.startsWith('data:')) {
       contents = contents.substring(contents.indexOf(',') + 1);
+    }
 
     return ImageSourceBase64(base64: contents);
   }
@@ -187,6 +207,14 @@ class Event {
   List<int> votingIds = [];
 
   Event({this.title});
+}
+
+@HiveType(typeId: 5)
+class ImageSourceFilename extends ImageSource {
+  @HiveField(0)
+  String filename;
+
+  ImageSourceFilename({@required this.filename});
 }
 
 class VoteResult {

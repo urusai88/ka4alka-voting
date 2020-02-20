@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/extensions.dart';
@@ -155,8 +159,14 @@ class _ListTileState extends State<_ListTile> {
                   child: InkWell(
                       onTap: () async {
                         try {
-                          state.human.image =
-                              ImageSource.fromString(await getFile());
+                          final base64 = await getFile();
+                          final response =
+                              await http.post('/image', body: base64);
+
+                          /// Имя файла. Например: 12313613.jpg
+                          final contents =
+                              utf8.decoder.convert(response.bodyBytes);
+                          state.human.image = ImageSource.fromString(contents);
 
                           BlocProvider.of<HumanBloc>(context)
                               .add(HumanUpdateEvent(human: state.human));

@@ -1,1 +1,2 @@
 flutter packages pub run build_runner build
+dart2native server/main.dart -o build/web/server.exe
