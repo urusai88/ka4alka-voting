@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image/image.dart' as image;
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/extensions.dart';
@@ -11,11 +12,10 @@ import 'package:ka4alka_voting/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
-import 'package:image/image.dart' as image;
 
 class VotingHumanListScreen extends StatelessWidget {
   static const RouteWildcard =
-      r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/(?<humanType>[\d]+)';
+      r'^\/events\/([\d]+)\/votings\/([\d]+)\/([\d]+)';
 
   final int eventId;
   final HumanList humanType;

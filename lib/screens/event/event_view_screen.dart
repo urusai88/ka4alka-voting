@@ -5,7 +5,7 @@ import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/widgets.dart';
 
 class EventViewScreen extends StatelessWidget {
-  static const RouteWildcard = r'\/events\/(?<eventId>[\d+])';
+  static const RouteWildcard = r'\/events\/([\d+])';
 
   final int eventId;
 

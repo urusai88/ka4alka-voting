@@ -77,8 +77,8 @@ class MyApp extends StatelessWidget {
               .startsWith(RegExp(VotingResultsCarouselScreen.RouteWildcard))) {
             final match = RegExp(VotingResultsCarouselScreen.RouteWildcard)
                 .firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
-            final votingId = int.parse(match.namedGroup('votingId'));
+            final eventId = int.parse(match.group(1));
+            final votingId = int.parse(match.group(2));
 
             return MaterialPageRoute(
                 builder: (context) {
@@ -94,8 +94,8 @@ class MyApp extends StatelessWidget {
               .startsWith(RegExp(VotingProcessScreen.RouteWildcard))) {
             final match = RegExp(VotingProcessScreen.RouteWildcard)
                 .firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
-            final votingId = int.parse(match.namedGroup('votingId'));
+            final eventId = int.parse(match.group(1));
+            final votingId = int.parse(match.group(2));
 
             return MaterialPageRoute(
                 builder: (context) {
@@ -111,9 +111,9 @@ class MyApp extends StatelessWidget {
               .startsWith(RegExp(VotingProcessCandidateScreen.RouteWildcard))) {
             final match = RegExp(VotingProcessCandidateScreen.RouteWildcard)
                 .firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
-            final votingId = int.parse(match.namedGroup('votingId'));
-            final candidateId = int.parse(match.namedGroup('candidateId'));
+            final eventId = int.parse(match.group(1));
+            final votingId = int.parse(match.group(2));
+            final candidateId = int.parse(match.group(3));
 
             return MaterialPageRoute(
                 builder: (context) {
@@ -132,10 +132,10 @@ class MyApp extends StatelessWidget {
               .startsWith(RegExp(VotingHumanListScreen.RouteWildcard))) {
             final match = RegExp(VotingHumanListScreen.RouteWildcard)
                 .firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
-            final votingId = int.parse(match.namedGroup('votingId'));
+            final eventId = int.parse(match.group(1));
+            final votingId = int.parse(match.group(2));
             final humanType =
-                HumanList.values[int.parse(match.namedGroup('humanType'))];
+                HumanList.values[int.parse(match.group(3))];
 
             return MaterialPageRoute(
                 builder: (context) {
@@ -154,7 +154,7 @@ class MyApp extends StatelessWidget {
               .startsWith(RegExp(VotingListScreen.RouteWildcard))) {
             final match = RegExp(VotingListScreen.RouteWildcard)
                 .firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
+            final eventId = int.parse(match.group(1));
 
             return MaterialPageRoute(
                 builder: (context) => VotingListScreen(eventId: eventId),
@@ -164,7 +164,7 @@ class MyApp extends StatelessWidget {
           if (settings.name.startsWith(RegExp(EventViewScreen.RouteWildcard))) {
             final match =
                 RegExp(EventViewScreen.RouteWildcard).firstMatch(settings.name);
-            final eventId = int.parse(match.namedGroup('eventId'));
+            final eventId = int.parse(match.group(1));
 
             return MaterialPageRoute(
                 builder: (context) => EventViewScreen(eventId: eventId),

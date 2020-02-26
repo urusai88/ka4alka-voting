@@ -11,7 +11,7 @@ import 'package:tuple/tuple.dart';
 
 class VotingProcessCandidateScreen extends StatelessWidget {
   static const RouteWildcard =
-      r'^\/events\/(?<eventId>[\d]+)\/votings\/(?<votingId>[\d]+)\/process\/(?<candidateId>[\d]+)';
+      r'^\/events\/([\d]+)\/votings\/([\d]+)\/process\/([\d]+)';
 
   final int candidateId;
 
