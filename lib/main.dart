@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
@@ -9,7 +8,6 @@ import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/repository.dart';
 import 'package:ka4alka_voting/screens/screens.dart';
 import 'package:ka4alka_voting/simple_bloc_delegate.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -27,14 +25,10 @@ void main() async {
 
   BlocSupervisor.delegate = SimpleBlocDelegate();
 
-  runApp(MultiProvider(
-      providers: [
-        Provider(create: (_) => Dio()),
-      ],
-      child: BlocProvider(
-        create: (context) => ScreenBloc(),
-        child: MyApp(),
-      )));
+  runApp(BlocProvider(
+    create: (context) => ScreenBloc(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
