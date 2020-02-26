@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:ka4alka_voting/blocs/blocs.dart';
 import 'package:ka4alka_voting/domain.dart';
 import 'package:ka4alka_voting/extensions.dart';
@@ -13,6 +11,7 @@ import 'package:ka4alka_voting/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
+import 'package:image/image.dart' as image;
 
 class VotingHumanListScreen extends StatelessWidget {
   static const RouteWildcard =
@@ -159,17 +158,29 @@ class _ListTileState extends State<_ListTile> {
                   child: InkWell(
                       onTap: () async {
                         try {
-                          final base64 = await getFile();
-                          final response =
-                              await http.post('/image', body: base64);
+                          var b64 = await getFile();
 
-                          /// Имя файла. Например: 12313613.jpg
-                          final contents =
-                              utf8.decoder.convert(response.bodyBytes);
-                          state.human.image = ImageSource.fromString(contents);
+                          if (b64.startsWith('data:')) {
+                            final extension = b64.substring(
+                                b64.indexOf('/') + 1, b64.indexOf(';'));
+                            final mime = b64.substring(b64.indexOf(':') + 1, b64.indexOf(';'));
 
-                          BlocProvider.of<HumanBloc>(context)
-                              .add(HumanUpdateEvent(human: state.human));
+                            b64 = b64.substring(b64.indexOf(',') + 1);
+
+                            final bytes = base64Decode(b64);
+
+                            final img = image.decodeImage(bytes);
+                            final resized = img.width > 512 ? image.copyResize(img, width: 512) : img;
+
+                            final resizedBytes = image.encodeNamedImage(resized, '.$extension');
+
+                            final nextBase64 = 'data:$mime;base64,${base64.encode(resizedBytes)}';
+
+                            state.human.image = ImageSource.fromString(nextBase64);
+
+                            BlocProvider.of<HumanBloc>(context)
+                                .add(HumanUpdateEvent(human: state.human));
+                          }
                         } catch (e) {
                           print(e);
                         }
